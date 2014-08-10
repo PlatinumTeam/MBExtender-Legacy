@@ -16,6 +16,7 @@ Copy MBExtender.exe, PluginLoader.dll, and TorqueMath.dll to the same folder as 
 Sample Plugins
 --------------
 
++ *MovingPlatformsFix* - Fixes moving platforms in multiplayer
 + *ConsoleSwag* - Creates an external console window for the game
 + *RandomPowerupsDemo* - Causes powerups built into the game engine to have random effects when used
 + *TestPlugin* - Demonstration of how to create a simple plugin

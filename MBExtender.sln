@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TorqueMath", "TorqueMath\To
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RandomPowerupsDemo", "RandomPowerupsDemo\RandomPowerupsDemo.vcxproj", "{DFE632A3-BECE-43A1-9FEE-A12C4CF10E22}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MovingPlatformsFix", "MovingPlatformsFix\MovingPlatformsFix.vcxproj", "{6C60CE79-3227-4198-A1B5-158D004F78A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -51,6 +53,10 @@ Global
 		{DFE632A3-BECE-43A1-9FEE-A12C4CF10E22}.Debug|Win32.Build.0 = Debug|Win32
 		{DFE632A3-BECE-43A1-9FEE-A12C4CF10E22}.Release|Win32.ActiveCfg = Release|Win32
 		{DFE632A3-BECE-43A1-9FEE-A12C4CF10E22}.Release|Win32.Build.0 = Release|Win32
+		{6C60CE79-3227-4198-A1B5-158D004F78A9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6C60CE79-3227-4198-A1B5-158D004F78A9}.Debug|Win32.Build.0 = Debug|Win32
+		{6C60CE79-3227-4198-A1B5-158D004F78A9}.Release|Win32.ActiveCfg = Release|Win32
+		{6C60CE79-3227-4198-A1B5-158D004F78A9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

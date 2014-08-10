@@ -19,7 +19,7 @@ const char *powerUpNames[5] =
 };
 
 static auto originalDoPowerUp = TGE::Members::Marble::doPowerUp;
-THISFN(void, myDoPowerUp, (void *thisObj, int id))
+THISFN(void, myDoPowerUp, (TGE::Marble *thisObj, int id))
 {
 	int newId = availablePowerUps[gRandGen.randI(0, 2)];
 	TGE::Con::printf("Forcing random powerup: %s", powerUpNames[newId - 1]);

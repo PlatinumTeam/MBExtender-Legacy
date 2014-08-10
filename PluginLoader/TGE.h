@@ -71,7 +71,7 @@
 
 // Defines a "raw" member function pointer
 // Note: IntelliSense will complain if args is empty, but the actual compiler doesn't care
-#define RAWMEMBERFN(rettype, name, args, addr) static const auto name = (rettype (__thiscall *) (EXPAND(void *thisobj, EXPAND args)))addr
+#define RAWMEMBERFN(clazz, rettype, name, args, addr) static const auto name = (rettype (__thiscall *) (EXPAND(clazz *thisobj, EXPAND args)))addr
 
 // Defines a wrapper which calls a member function on a class
 // Yes, argument names need to be repeated, but there's not much I can do about that AFAIK
@@ -100,11 +100,19 @@
 	const auto name = (rettype (__thiscall *) args) z_thisfn_jmp_##name;  \
 	rettype __fastcall z_thisfn_impl_##name (EXPAND(void*, EXPAND args))
 
+// Defines a getter for a class field
+#define GETTERFN(type, name, offset)                                             \
+	type name()                                                                  \
+	{                                                                            \
+		return *reinterpret_cast<type*>(reinterpret_cast<char*>(this) + offset); \
+	}
+
 namespace TGE
 {
 	// Class prototypes
 	class SimObject;
 	class BaseMatInstance;
+	class GameConnection;
 	struct Move;
 }
 
@@ -114,6 +122,8 @@ typedef S32         (*IntCallback)   (TGE::SimObject *obj, S32 argc, const char 
 typedef F32         (*FloatCallback) (TGE::SimObject *obj, S32 argc, const char *argv[]);
 typedef void        (*VoidCallback)  (TGE::SimObject *obj, S32 argc, const char *argv[]);
 typedef bool        (*BoolCallback)  (TGE::SimObject *obj, S32 argc, const char *argv[]);
+
+typedef U32 SimObjectId;
 
 namespace TGE
 {
@@ -128,6 +138,9 @@ namespace TGE
 	class SimObject: public ConsoleObject
 	{
 	public:
+		GETTERFN(SimObjectId, getId, 0x20);
+		MEMBERFN(const char*, getIdString, (), (), 0x404282);
+
 		UNDEFVIRT(processArguments);
 		UNDEFVIRT(onAdd);
 		UNDEFVIRT(onRemove);
@@ -146,8 +159,6 @@ namespace TGE
 		UNDEFVIRT(findObject);
 		UNDEFVIRT(write);
 		UNDEFVIRT(registerLights);
-
-		MEMBERFN(const char*, getIdString, (), (), 0x404282);
 	};
 
 	class NetObject: public SimObject
@@ -200,6 +211,8 @@ namespace TGE
 	class GameBase : public SceneObject
 	{
 	public:
+		GETTERFN(GameConnection*, getControllingClient, 0x270);
+
 		UNDEFVIRT(onNewDataBlock);
 		UNDEFVIRT(processTick);
 		UNDEFVIRT(interpolateTick);
@@ -365,10 +378,39 @@ namespace TGE
 		virtual void writeString(const char *str, S32 maxLength = 255) = 0;
 	};
 
-	class FileStream : Stream
+	class FileStream : public Stream
 	{
 	public:
 		MEMBERFN(bool, open, (const char *path, int accessMode), (path, accessMode), 0x405F10);
+	};
+
+	class ConnectionProtocol
+	{
+	private:
+		// TODO: Clean this up, this is just so casting SimObject* to NetConnection* works properly
+		unsigned char fields[0x9C];
+		virtual void placeholder() = 0; // Force virtual inheritance
+	};
+
+	class NetConnection : public ConnectionProtocol, public SimObject
+	{
+	public:
+		static NetConnection *getConnectionToServer()
+		{
+			GLOBALVAR(TGE::SimObject*, mServerConnection, 0x6E0FDC);
+			return static_cast<TGE::NetConnection*>(mServerConnection);
+		}
+	};
+
+	class GameConnection : public NetConnection
+	{
+	};
+
+	class PathedInterior : public GameBase
+	{
+	public:
+		MEMBERFN(void, advance, (double delta), (delta), 0x4075FE);
+		MEMBERFN(void, computeNextPathStep, (U32 delta), (delta), 0x40879C);
 	};
 
 	// Console enums
@@ -471,18 +513,24 @@ namespace TGE
 	{
 		namespace OpenGLDevice
 		{
-			RAWMEMBERFN(void, initDevice, (), 0x4033BE);
+			RAWMEMBERFN(TGE::OpenGLDevice, void, initDevice, (), 0x4033BE);
 		}
 
 		namespace Marble
 		{
-			RAWMEMBERFN(void, doPowerUp, (int id), 0x405F51);
-			RAWMEMBERFN(void, advancePhysics, (const Move *move, U32 delta), 0x40252C);
+			RAWMEMBERFN(TGE::Marble, void, doPowerUp, (int id), 0x405F51);
+			RAWMEMBERFN(TGE::Marble, void, advancePhysics, (const Move *move, U32 delta), 0x40252C);
 		}
 
 		namespace FileStream
 		{
-			RAWMEMBERFN(bool, open, (const char *path, int accessMode), 0x405F10);
+			RAWMEMBERFN(TGE::FileStream, bool, open, (const char *path, int accessMode), 0x405F10);
+		}
+
+		namespace PathedInterior
+		{
+			RAWMEMBERFN(TGE::PathedInterior, void, advance, (double delta), 0x4075FE);
+			RAWMEMBERFN(TGE::PathedInterior, void, computeNextPathStep, (U32 delta), 0x40879C);
 		}
 	}
 
