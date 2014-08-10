@@ -100,16 +100,20 @@
 	const auto name = (rettype (__thiscall *) args) z_thisfn_jmp_##name;  \
 	rettype __fastcall z_thisfn_impl_##name (EXPAND(void*, EXPAND args))
 
-// Class prototypes
-class SimObject;
-class BaseMatInstance;
+namespace TGE
+{
+	// Class prototypes
+	class SimObject;
+	class BaseMatInstance;
+	struct Move;
+}
 
 // TGE callback types
-typedef const char* (*StringCallback)(SimObject *obj, S32 argc, const char *argv[]);
-typedef S32         (*IntCallback)   (SimObject *obj, S32 argc, const char *argv[]);
-typedef F32         (*FloatCallback) (SimObject *obj, S32 argc, const char *argv[]);
-typedef void        (*VoidCallback)  (SimObject *obj, S32 argc, const char *argv[]);
-typedef bool        (*BoolCallback)  (SimObject *obj, S32 argc, const char *argv[]);
+typedef const char* (*StringCallback)(TGE::SimObject *obj, S32 argc, const char *argv[]);
+typedef S32         (*IntCallback)   (TGE::SimObject *obj, S32 argc, const char *argv[]);
+typedef F32         (*FloatCallback) (TGE::SimObject *obj, S32 argc, const char *argv[]);
+typedef void        (*VoidCallback)  (TGE::SimObject *obj, S32 argc, const char *argv[]);
+typedef bool        (*BoolCallback)  (TGE::SimObject *obj, S32 argc, const char *argv[]);
 
 namespace TGE
 {
@@ -142,6 +146,8 @@ namespace TGE
 		UNDEFVIRT(findObject);
 		UNDEFVIRT(write);
 		UNDEFVIRT(registerLights);
+
+		MEMBERFN(const char*, getIdString, (), (), 0x404282);
 	};
 
 	class NetObject: public SimObject
@@ -156,8 +162,8 @@ namespace TGE
 	class SceneObject: public NetObject
 	{
 	public:
-		UNDEFVIRT(disableCollision);
-		UNDEFVIRT(enableCollision);
+		virtual void disableCollision() = 0;
+		virtual void enableCollision() = 0;
 		UNDEFVIRT(isDisplacable);
 		UNDEFVIRT(getMomentum);
 		UNDEFVIRT(setMomentum);
@@ -471,6 +477,7 @@ namespace TGE
 		namespace Marble
 		{
 			RAWMEMBERFN(void, doPowerUp, (int id), 0x405F51);
+			RAWMEMBERFN(void, advancePhysics, (const Move *move, U32 delta), 0x40252C);
 		}
 
 		namespace FileStream
@@ -502,8 +509,8 @@ namespace TGE
 
 // Defines a console function.
 #define ConsoleFunction(name, returnType, minArgs, maxArgs, usage)                         \
-	static returnType c##name(SimObject *, S32, const char **argv);                        \
+	static returnType c##name(TGE::SimObject *, S32, const char **argv);                   \
 	static TGE::_ConsoleConstructor g##name##obj(#name, c##name, usage, minArgs, maxArgs); \
-	static returnType c##name(SimObject *, S32 argc, const char **argv)
+	static returnType c##name(TGE::SimObject *, S32 argc, const char **argv)
 
 #endif
