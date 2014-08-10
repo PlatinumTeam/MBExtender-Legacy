@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\CodeInjection">
+      <UniqueIdentifier>{0a4b3a35-19ab-4424-b80d-02d65c890c3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CodeInjection">
+      <UniqueIdentifier>{de2bf531-8baa-4c6d-9c2e-0eb6f937e68a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LDE64">
+      <UniqueIdentifier>{e903d9d7-99f7-437f-acec-1025a68dca41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LDE64">
+      <UniqueIdentifier>{f379d1ec-bae0-4926-9165-88f4b282fee4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PeSectionFinder.h">
+      <Filter>Header Files\CodeInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeInjectionStream.h">
+      <Filter>Header Files\CodeInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32PluginInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeAllocator.h">
+      <Filter>Header Files\CodeInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="LDE64\LDE64.h">
+      <Filter>Header Files\LDE64</Filter>
+    </ClInclude>
+    <ClInclude Include="TrampolineGenerator.h">
+      <Filter>Header Files\CodeInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="FuncInterceptor.h">
+      <Filter>Header Files\CodeInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="TGE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PluginLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeInjectionStream.cpp">
+      <Filter>Source Files\CodeInjection</Filter>
+    </ClCompile>
+    <ClCompile Include="PeSectionFinder.cpp">
+      <Filter>Source Files\CodeInjection</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32PluginInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeAllocator.cpp">
+      <Filter>Source Files\CodeInjection</Filter>
+    </ClCompile>
+    <ClCompile Include="TrampolineGenerator.cpp">
+      <Filter>Source Files\CodeInjection</Filter>
+    </ClCompile>
+    <ClCompile Include="FuncInterceptor.cpp">
+      <Filter>Source Files\CodeInjection</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PluginLoader.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="LDE64\LDE64.asm">
+      <Filter>Source Files\LDE64</Filter>
+    </MASM>
+  </ItemGroup>
+</Project>
