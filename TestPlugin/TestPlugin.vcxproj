@@ -93,6 +93,11 @@
     </ClCompile>
     <ClCompile Include="TestPlugin.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TorqueMath\TorqueMath.vcxproj">
+      <Project>{235739a0-ccc8-4b33-84e2-9599d6b7d160}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
