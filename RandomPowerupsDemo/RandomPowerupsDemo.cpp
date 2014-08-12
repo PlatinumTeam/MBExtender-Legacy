@@ -26,8 +26,12 @@ THISFN(void, myDoPowerUp, (TGE::Marble *thisObj, int id))
 	originalDoPowerUp(thisObj, newId);
 }
 
-PLUGINAPI void initPlugin(PluginInterface *plugin)
+PLUGINAPI void preEngineInit(PluginInterface *plugin)
+{
+}
+
+PLUGINAPI void postEngineInit(PluginInterface *plugin)
 {
 	auto interceptor = plugin->getInterceptor();
-	originalDoPowerUp = interceptor->intercept(TGE::Members::Marble::doPowerUp, myDoPowerUp);
+	originalDoPowerUp = interceptor->intercept(originalDoPowerUp, myDoPowerUp);
 }

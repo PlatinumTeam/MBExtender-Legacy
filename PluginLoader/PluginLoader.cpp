@@ -1,6 +1,8 @@
 // PluginLoader.cpp : Defines the exported functions for the DLL application.
 //
 
+#include <vector>
+#include <string>
 #include "TGE.h"
 #include "FuncInterceptor.h"
 #include "Win32PluginInterface.h"
@@ -15,6 +17,13 @@ static Win32TorqueFunctionInterceptor win32Interceptor(&hook);
 
 typedef void (*initMath_t)();
 typedef void (*initPlugin_t)(PluginInterface *plugin);
+
+struct LoadedPlugin
+{
+	std::string path;
+	HMODULE module;
+};
+static std::vector<LoadedPlugin> loadedPlugins;
 
 static void loadPlugins()
 {
@@ -32,23 +41,13 @@ static void loadPlugins()
 		HMODULE plugin = LoadLibrary(pathBuf);
 		if (plugin != NULL)
 		{
-			// If it exports an initialization function, call it
-			auto initFunc = reinterpret_cast<initPlugin_t>(GetProcAddress(plugin, "initPlugin"));
-			if (initFunc != NULL)
-				initFunc(new Win32PluginInterface(&win32Interceptor, pathBuf));
-			else
-				TGE::Con::warnf("   WARNING: %s does not have an initPlugin() function!", pathBuf);
+			LoadedPlugin info = { pathBuf, plugin };
+			loadedPlugins.push_back(info);
 		}
 		else
 		{
 			TGE::Con::errorf("   Unable to load %s!", pathBuf);
 		}
-
-		// Set the Plugin::Loaded variable corresponding to the plugin
-		std::string varName = fileInfo.cFileName;
-		varName.erase(varName.find_last_of('.')); // Remove file extension
-		varName = "Plugin::Loaded" + varName;
-		TGE::Con::setBoolVariable(varName.c_str(), true);
 		
 		// Move to the next file
 		if (!FindNextFile(find, &fileInfo))
@@ -56,6 +55,53 @@ static void loadPlugins()
 			FindClose(find);
 			find = INVALID_HANDLE_VALUE;
 		}
+	}
+}
+
+static void callPluginInit(const char *fnName)
+{
+	for (auto &plugin : loadedPlugins)
+	{
+		TGE::Con::printf("   Initializing %s", plugin.path.c_str());
+
+		// If it exports an initialization function, call it
+		auto initFunc = reinterpret_cast<initPlugin_t>(GetProcAddress(plugin.module, fnName));
+		if (initFunc != NULL)
+			initFunc(new Win32PluginInterface(&win32Interceptor, plugin.path.c_str()));
+		else
+			TGE::Con::warnf("   WARNING: %s does not have a %s() function!", fnName, plugin.path);
+	}
+}
+
+static void pluginPreInit()
+{
+	if (loadedPlugins.size() == 0)
+		return;
+
+	TGE::Con::printf("MBExtender: Initializing Plugins, Stage 1:");
+	callPluginInit("preEngineInit");
+	TGE::Con::printf("");
+}
+
+static void pluginPostInit()
+{
+	if (loadedPlugins.size() == 0)
+		return;
+
+	TGE::Con::printf("MBExtender: Initializing Plugins, Stage 2:");
+	callPluginInit("postEngineInit");
+	TGE::Con::printf("");
+}
+
+static void setPluginVariables()
+{
+	for (auto &plugin : loadedPlugins)
+	{
+		// Set the Plugin::Loaded variable corresponding to the plugin
+		std::string varName = plugin.path;
+		varName.erase(varName.find_last_of('.')); // Remove file extension
+		varName = "Plugin::Loaded" + varName;
+		TGE::Con::setBoolVariable(varName.c_str(), true);
 	}
 }
 
@@ -75,15 +121,25 @@ static void loadMathLibrary()
 	TGE::Con::errorf("   Unable to load TorqueMath.dll! Some plugins may fail to load!");
 }
 
-static auto originalParticleInit = TGE::ParticleEngine::init;
-static void newParticleInit()
+static auto originalNsInit = TGE::Namespace::init;
+static void newNsInit()
 {
-	originalParticleInit();
+	originalNsInit();
 
 	TGE::Con::printf("MBExtender Init:");
 	loadMathLibrary();
 	loadPlugins();
 	TGE::Con::printf("");
+	pluginPreInit();
+}
+
+static auto originalParticleInit = TGE::ParticleEngine::init;
+static void newParticleInit()
+{
+	originalParticleInit();
+
+	pluginPostInit();
+	setPluginVariables();
 }
 
 // Handles onClientProcess() callbacks
@@ -149,6 +205,7 @@ DWORD WINAPI initPluginLoader(LPVOID unused)
 	}
 
 	// Intercept ParticleEngine::init() because it's the last module that loads before main.cs is executed
+	originalNsInit = hook.intercept(TGE::Namespace::init, newNsInit);
 	originalParticleInit = hook.intercept(TGE::ParticleEngine::init, newParticleInit);
 
 	// Intercept clientProcess() to call plugin callbacks

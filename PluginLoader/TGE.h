@@ -413,6 +413,12 @@ namespace TGE
 		MEMBERFN(void, computeNextPathStep, (U32 delta), (delta), 0x40879C);
 	};
 
+	class AbstractClassRep
+	{
+	public:
+		GETTERFN(const char*, getClassName, 0x2C);
+	};
+
 	// Console enums
 	namespace ConsoleLogEntry
 	{
@@ -474,11 +480,16 @@ namespace TGE
 		FN(void, setFloatVariable, (const char *name, F32 value),         0x4049E9);
 
 		// Misc
-		FN(const char*, execute,              (S32 argc, const char *argv[]),                         0x403E13);
-		FN(const char*, evaluate,             (const char *string, bool echo, const char *fileName),  0x401E56);
-		FN(const char*, evaluatef,            (const char* string, ...),                              0x40713F);
-		FN(char*,       getReturnBuffer,      (U32 bufferSize),                                       0x407211);
-		FN(bool,        expandScriptFilename, (char *filename, U32 size, const char *src),            0x402B35);
+		FN(const char*, execute,              (S32 argc, const char *argv[]),                        0x403E13);
+		FN(const char*, evaluate,             (const char *string, bool echo, const char *fileName), 0x401E56);
+		FN(const char*, evaluatef,            (const char* string, ...),                             0x40713F);
+		FN(char*,       getReturnBuffer,      (U32 bufferSize),                                      0x407211);
+		FN(bool,        expandScriptFilename, (char *filename, U32 size, const char *src),           0x402B35);
+	}
+
+	namespace Namespace
+	{
+		FN(void, init, (), 0x407CE3);
 	}
 
 	namespace ParticleEngine
@@ -532,9 +543,15 @@ namespace TGE
 			RAWMEMBERFN(TGE::PathedInterior, void, advance, (double delta), 0x4075FE);
 			RAWMEMBERFN(TGE::PathedInterior, void, computeNextPathStep, (U32 delta), 0x40879C);
 		}
+
+		namespace AbstractClassRep
+		{
+			FN(void, initialize, (), 0x401CF3);
+		}
 	}
 
 	FN(void, clientProcess, (U32 timeDelta), 0x403B2A);
+	FN(void, dQsort, (void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const void*, const void*)), 0x40176C);
 
 	// Global variables
 	GLOBALVAR(Container, gClientContainer, 0x6E1838);

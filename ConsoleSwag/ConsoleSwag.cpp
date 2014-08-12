@@ -60,8 +60,11 @@ void inputThread()
 	}
 }
 
-// Entry point for the plugin
-PLUGINAPI void initPlugin(PluginInterface *plugin)
+PLUGINAPI void preEngineInit(PluginInterface *plugin)
+{
+}
+
+PLUGINAPI void postEngineInit(PluginInterface *plugin)
 {
 	// Set up a console window and redirect stdio to it
 	AllocConsole();

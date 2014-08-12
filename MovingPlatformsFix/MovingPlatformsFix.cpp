@@ -32,7 +32,11 @@ THISFN(void, myAdvance, (TGE::PathedInterior *thisObj, double delta))
 		originalAdvance(thisObj, delta);
 }
 
-PLUGINAPI void initPlugin(PluginInterface *plugin)
+PLUGINAPI void preEngineInit(PluginInterface *plugin)
+{
+}
+
+PLUGINAPI void postEngineInit(PluginInterface *plugin)
 {
 	auto interceptor = plugin->getInterceptor();
 	originalAdvancePhysics = interceptor->intercept(originalAdvancePhysics, myAdvancePhysics);
