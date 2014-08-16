@@ -41,10 +41,10 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\TorqueMath;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\TorqueLib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)\TorqueMath;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\TorqueLib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -94,7 +94,7 @@
     <ClCompile Include="TestPlugin.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TorqueMath\TorqueMath.vcxproj">
+    <ProjectReference Include="..\TorqueLib\TorqueLib.vcxproj">
       <Project>{235739a0-ccc8-4b33-84e2-9599d6b7d160}</Project>
     </ProjectReference>
   </ItemGroup>

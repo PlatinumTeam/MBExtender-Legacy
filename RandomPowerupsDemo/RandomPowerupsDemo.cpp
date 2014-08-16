@@ -18,20 +18,17 @@ const char *powerUpNames[5] =
 	"Gyrocopter"
 };
 
-static auto originalDoPowerUp = TGE::Members::Marble::doPowerUp;
-THISFN(void, myDoPowerUp, (TGE::Marble *thisObj, int id))
+TorqueOverrideMember(void, Marble::doPowerUp, (TGE::Marble *thisObj, int id), originalDoPowerUp)
 {
 	int newId = availablePowerUps[gRandGen.randI(0, 2)];
 	TGE::Con::printf("Forcing random powerup: %s", powerUpNames[newId - 1]);
 	originalDoPowerUp(thisObj, newId);
 }
 
-PLUGINAPI void preEngineInit(PluginInterface *plugin)
+PLUGINCALLBACK void preEngineInit(PluginInterface *plugin)
 {
 }
 
-PLUGINAPI void postEngineInit(PluginInterface *plugin)
+PLUGINCALLBACK void postEngineInit(PluginInterface *plugin)
 {
-	auto interceptor = plugin->getInterceptor();
-	originalDoPowerUp = interceptor->intercept(originalDoPowerUp, myDoPowerUp);
 }

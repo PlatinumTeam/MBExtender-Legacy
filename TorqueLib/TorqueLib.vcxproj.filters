@@ -28,6 +28,9 @@
     <Filter Include="Header Files\platform">
       <UniqueIdentifier>{587b728b-7621-41a2-8ac1-b94c8c320105}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{984e2783-efb6-45bc-ac46-b2d370674017}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="math\util\quadTransforms.cpp">
@@ -90,7 +93,7 @@
     <ClCompile Include="..\PluginLoader\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TorqueMath.cpp">
+    <ClCompile Include="TorqueLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -175,6 +178,15 @@
     </ClInclude>
     <ClInclude Include="platform\platformAssert.h">
       <Filter>Header Files\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tVector.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="TGE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QuickOverride.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

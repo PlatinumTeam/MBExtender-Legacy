@@ -5,10 +5,9 @@
 
 #include <cstdarg>
 
-// Include files from TorqueMath
-// It's only necessary to link to the DLL if you actually use functions from the library
-#include "../TorqueMath/platform/platform.h"
-#include "../TorqueMath/math/mMath.h"
+#include "platform/platform.h"
+#include "math/mMath.h"
+#include "util/tVector.h"
 
 #ifdef _DEBUG
 #define DEBUG_PRINTF(fmt, ...) TGE::Con::printf(fmt, __VA_ARGS__)
@@ -70,16 +69,24 @@
 #define UNDEFVIRT(name) virtual void z_undef_##name##_() = 0
 
 // Defines a "raw" member function pointer
-// Note: IntelliSense will complain if args is empty, but the actual compiler doesn't care
 #define RAWMEMBERFN(clazz, rettype, name, args, addr) static const auto name = (rettype (__thiscall *) (EXPAND(clazz *thisobj, EXPAND args)))addr
+
+// Same as RAWMEMBERFN, but defines a "simple" pointer with no arguments
+#define RAWMEMBERFNSIMP(clazz, rettype, name, addr) static const auto name = (rettype (__thiscall *) (clazz *thisobj))addr
 
 // Defines a wrapper which calls a member function on a class
 // Yes, argument names need to be repeated, but there's not much I can do about that AFAIK
-// Note: IntelliSense will complain if args is empty, but the actual compiler doesn't care
 #define MEMBERFN(rettype, name, args, argnames, addr)                                                       \
 	rettype name args                                                                                       \
 	{                                                                                                       \
 		return ((rettype (__thiscall *) (EXPAND(void*, EXPAND args)))addr) (EXPAND(this, EXPAND argnames)); \
+	}
+
+// Same as MEMBERFN, but defines a "simple" wrapper with no arguments
+#define MEMBERFNSIMP(rettype, name, addr)                    \
+	rettype name()                                           \
+	{                                                        \
+		return ((rettype (__thiscall *) (void*))addr)(this); \
 	}
 
 // Defines a global variable
@@ -97,7 +104,8 @@
 			__asm jmp z_thisfn_impl_##name                                \
 		}                                                                 \
 	}                                                                     \
-	const auto name = (rettype (__thiscall *) args) z_thisfn_jmp_##name;  \
+	typedef rettype (__thiscall* z_thisfn_ptr_##name) args; \
+	const z_thisfn_ptr_##name name = (z_thisfn_ptr_##name) z_thisfn_jmp_##name;  \
 	rettype __fastcall z_thisfn_impl_##name (EXPAND(void*, EXPAND args))
 
 // Defines a getter for a class field
@@ -105,6 +113,13 @@
 	type name()                                                                  \
 	{                                                                            \
 		return *reinterpret_cast<type*>(reinterpret_cast<char*>(this) + offset); \
+	}
+
+// Defines a setter for a class field
+#define SETTERFN(type, name, offset)                                                 \
+	void name(type newValue)                                                         \
+	{                                                                                \
+		*reinterpret_cast<type*>(reinterpret_cast<char*>(this) + offset) = newValue; \
 	}
 
 namespace TGE
@@ -139,7 +154,7 @@ namespace TGE
 	{
 	public:
 		GETTERFN(SimObjectId, getId, 0x20);
-		MEMBERFN(const char*, getIdString, (), (), 0x404282);
+		MEMBERFNSIMP(const char*, getIdString, 0x404282);
 
 		UNDEFVIRT(processArguments);
 		UNDEFVIRT(onAdd);
@@ -384,6 +399,53 @@ namespace TGE
 		MEMBERFN(bool, open, (const char *path, int accessMode), (path, accessMode), 0x405F10);
 	};
 
+	class File
+	{
+	public:
+		/// What is the status of our file handle?
+		enum FileStatus
+		{
+			Ok = 0,      ///< Ok!
+			IOError,     ///< Read or Write error
+			EOS,         ///< End of Stream reached (mostly for reads)
+			IllegalCall, ///< An unsupported operation used. Always accompanied by AssertWarn
+			Closed,      ///< Tried to operate on a closed stream (or detached filter)
+			UnknownError ///< Catchall
+		};
+
+		/// How are we accessing the file?
+		enum AccessMode
+		{
+			Read = 0,       ///< Open for read only, starting at beginning of file.
+			Write = 1,      ///< Open for write only, starting at beginning of file; will blast old contents of file.
+			ReadWrite = 2,  ///< Open for read-write.
+			WriteAppend = 3 ///< Write-only, starting at end of file.
+		};
+
+		/// Flags used to indicate what we can do to the file.
+		enum Capability
+		{
+			FileRead = 1 << 0,
+			FileWrite = 1 << 1
+		};
+
+		MEMBERFN(FileStatus, open, (const char *filename, const AccessMode openMode), (filename, openMode), 0x4019A1);
+		MEMBERFNSIMP(U32, getPosition, 0x405E8E);
+		MEMBERFN(FileStatus, setPosition, (S32 position, bool absolutePos), (position, absolutePos), 0x404B8D);
+		MEMBERFNSIMP(U32, getSize, 0x40889B);
+		MEMBERFNSIMP(FileStatus, flush, 0x407F45);
+		MEMBERFNSIMP(FileStatus, close, 0x406D93);
+		MEMBERFNSIMP(FileStatus, getStatus, 0x4044B7);
+		MEMBERFN(FileStatus, read, (U32 size, char *dst, U32 *bytesRead), (size, dst, bytesRead), 0x4090FC);
+		MEMBERFN(FileStatus, write, (U32 size, const char *src, U32 *bytesWritten), (size, src, bytesWritten), 0x4017D5);
+
+		MEMBERFN(void, setStatus, (FileStatus status), (status), 0x409403); // Technically supposed to be protected
+		GETTERFN(void*, getHandle, 0x4);
+		SETTERFN(void*, setHandle, 0x4);
+		GETTERFN(Capability, getCapabilities, 0xC);
+		SETTERFN(Capability, setCapabilities, 0xC);
+	};
+
 	class ConnectionProtocol
 	{
 	private:
@@ -417,6 +479,12 @@ namespace TGE
 	{
 	public:
 		GETTERFN(const char*, getClassName, 0x2C);
+	};
+
+	class _StringTable
+	{
+	public:
+		MEMBERFN(const char*, insert, (const char *string, bool caseSens), (string, caseSens), 0x403314);
 	};
 
 	// Console enums
@@ -487,6 +555,21 @@ namespace TGE
 		FN(bool,        expandScriptFilename, (char *filename, U32 size, const char *src),           0x402B35);
 	}
 
+	// NOTE: THIS IS ONLY FOR WINDOWS. IT WILL BE DIFFERENT ON MAC AND LINUX.
+	struct FileTime
+	{
+		U32 low;
+		U32 high;
+	};
+
+	namespace Platform
+	{
+		FN(bool, dumpPath, (const char *path, Vector<FileInfo>& fileVector), 0x403AF3);
+		FN(const char*, getWorkingDirectory, (), 0x402F7C);
+		FN(bool, isSubDirectory, (const char *parent, const char *child), 0x4088A0);
+		FN(bool, getFileTimes, (const char *path, FileTime *createTime, FileTime *modifyTime), 0x4033D2);
+	}
+
 	namespace Namespace
 	{
 		FN(void, init, (), 0x407CE3);
@@ -524,7 +607,7 @@ namespace TGE
 	{
 		namespace OpenGLDevice
 		{
-			RAWMEMBERFN(TGE::OpenGLDevice, void, initDevice, (), 0x4033BE);
+			RAWMEMBERFNSIMP(TGE::OpenGLDevice, void, initDevice, 0x4033BE);
 		}
 
 		namespace Marble
@@ -548,14 +631,34 @@ namespace TGE
 		{
 			FN(void, initialize, (), 0x401CF3);
 		}
+
+		namespace File
+		{
+			RAWMEMBERFN(TGE::File, TGE::File::FileStatus, open, (const char *filename, const TGE::File::AccessMode openMode), 0x4019A1);
+			RAWMEMBERFNSIMP(TGE::File, U32, getPosition, 0x405E8E);
+			RAWMEMBERFN(TGE::File, TGE::File::FileStatus, setPosition, (S32 position, bool absolutePos), 0x404B8D);
+			RAWMEMBERFNSIMP(TGE::File, U32, getSize, 0x40889B);
+			RAWMEMBERFNSIMP(TGE::File, TGE::File::FileStatus, flush, 0x407F45);
+			RAWMEMBERFNSIMP(TGE::File, TGE::File::FileStatus, close, 0x406D93);
+			RAWMEMBERFNSIMP(TGE::File, TGE::File::FileStatus, getStatus, 0x4044B7);
+			RAWMEMBERFN(TGE::File, void, setStatus, (TGE::File::FileStatus status), 0x409403); // Technically supposed to be protected
+			RAWMEMBERFN(TGE::File, TGE::File::FileStatus, read, (U32 size, char *dst, U32 *bytesRead), 0x4090FC);
+			RAWMEMBERFN(TGE::File, TGE::File::FileStatus, write, (U32 size, const char *src, U32 *bytesWritten), 0x4017D5);
+			RAWMEMBERFNSIMP(TGE::File, void, destructor_, 0x404B10);
+		}
 	}
 
 	FN(void, clientProcess, (U32 timeDelta), 0x403B2A);
+
+	// Platform functions
+	FN(void, dFree, (void *ptr), 0x404269);
 	FN(void, dQsort, (void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const void*, const void*)), 0x40176C);
+	FN(bool, VectorResize, (U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount, U32 elemSize), 0x4010C8);
 
 	// Global variables
 	GLOBALVAR(Container, gClientContainer, 0x6E1838);
 	GLOBALVAR(Container, gServerContainer, 0x6E1760);
+	GLOBALVAR(_StringTable*, StringTable, 0x6A4FD0);
 }
 
 // ConsoleFunction() can't be used from inside PluginLoader.dll without crashes

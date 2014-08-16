@@ -3,6 +3,8 @@
 #include <intrin.h>
 #include <Windows.h>
 #include "math/mMath.h"
+#include "QuickOverride.h"
+#include "../PluginLoader/PluginInterface.h"
 
 // Hooray for super hacked-together CPU detection code!
 #define CPUID_INDEX_SSE 3
@@ -61,8 +63,26 @@ void seedGenerator()
 	MRandomLCG::setGlobalRandSeed(GetTickCount());
 }
 
+namespace TorqueLib
+{
+	__declspec(dllexport) OverrideRequest *requestList = nullptr;
+}
+
 extern "C" __declspec(dllexport) void init()
 {
 	installExtensions();
 	seedGenerator();
+}
+
+extern "C" __declspec(dllexport) void installUserOverrides(TorqueFunctionInterceptor *interceptor)
+{
+	TorqueLib::OverrideRequest *currentOverride = TorqueLib::requestList;
+	while (currentOverride)
+	{
+		typedef void (*tmpfnptr_t)(); // The two pointers need to be casted to something, since intercept doesn't allow two void*'s for safety reasons
+		tmpfnptr_t originalFn = static_cast<tmpfnptr_t>(*currentOverride->originalFunctionPtr);
+		tmpfnptr_t newFn = static_cast<tmpfnptr_t>(currentOverride->newFunction);
+		*currentOverride->originalFunctionPtr = interceptor->intercept(originalFn, newFn);
+		currentOverride = currentOverride->nextOverride;
+	}
 }

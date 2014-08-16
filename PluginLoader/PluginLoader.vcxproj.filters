@@ -51,9 +51,6 @@
     <ClInclude Include="FuncInterceptor.h">
       <Filter>Header Files\CodeInjection</Filter>
     </ClInclude>
-    <ClInclude Include="TGE.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PluginLoader.cpp">

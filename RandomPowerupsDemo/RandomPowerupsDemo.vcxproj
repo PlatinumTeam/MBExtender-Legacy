@@ -51,6 +51,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;RANDOMPOWERUPSDEMO_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -86,7 +87,7 @@
     <ClCompile Include="RandomPowerupsDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TorqueMath\TorqueMath.vcxproj">
+    <ProjectReference Include="..\TorqueLib\TorqueLib.vcxproj">
       <Project>{235739a0-ccc8-4b33-84e2-9599d6b7d160}</Project>
     </ProjectReference>
   </ItemGroup>

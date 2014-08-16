@@ -35,16 +35,16 @@ ConsoleFunction(idTest, void, 2, 2, "idTest(obj)")
 
 bool initializingClasses = false;
 
-auto originalInitialize = TGE::Members::AbstractClassRep::initialize;
-void myInitialize()
+TorqueOverride(void, Members::AbstractClassRep::initialize, (), originalInitialize)
 {
+	TGE::Con::printf("ACR init");
+
 	initializingClasses = true;
 	originalInitialize();
 	initializingClasses = false;
 }
 
-auto originalDQSort = TGE::dQsort;
-void myDQSort(void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const void*, const void*))
+TorqueOverride(void, dQsort, (void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const void*, const void*)), originalDQSort)
 {
 	originalDQSort(base, nelem, width, fcmp);
 	if (initializingClasses)
@@ -54,21 +54,18 @@ void myDQSort(void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const
 		{
 			TGE::Con::printf("Class %s -> ID %d", classes[i]->getClassName(), i);
 		}
-		TGE::Con::printf("");
+		TGE::Con::printf(" ");
 	}
 }
 
-PLUGINAPI void preEngineInit(PluginInterface *plugin)
+PLUGINCALLBACK void preEngineInit(PluginInterface *plugin)
 {
-	auto interceptor = plugin->getInterceptor();
-	originalInitialize = interceptor->intercept(originalInitialize, myInitialize);
-	originalDQSort = interceptor->intercept(originalDQSort, myDQSort);
 }
 
-PLUGINAPI void postEngineInit(PluginInterface *plugin)
+PLUGINCALLBACK void postEngineInit(PluginInterface *plugin)
 {
-	// This might seem useless, but it forces the plugin to import from TorqueMath.dll
-	// So it lets us test TorqueMath.dll loading
+	// This might seem useless, but it forces the plugin to import from TorqueLib.dll
+	// So it lets us test TorqueLib.dll loading
 	MathUtils::randomPointInSphere(10);
 
 	TGE::Con::printf("      Hello from %s!", plugin->getPath());

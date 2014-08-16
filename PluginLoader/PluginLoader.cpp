@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <string>
-#include "TGE.h"
 #include "FuncInterceptor.h"
 #include "Win32PluginInterface.h"
 
@@ -11,19 +10,26 @@
 #define PLUGIN_FILTER (PLUGIN_DIR "*.dll")
 #define PLUGIN_DIR_LEN 9
 
-static CodeInjection::CodeAllocator codeAlloc;
-static CodeInjection::FuncInterceptor hook(&codeAlloc);
-static Win32TorqueFunctionInterceptor win32Interceptor(&hook);
-
-typedef void (*initMath_t)();
-typedef void (*initPlugin_t)(PluginInterface *plugin);
+typedef void(*initMath_t)();
+typedef void(*installOverrides_t)(TorqueFunctionInterceptor *interceptor);
+typedef void(*initPlugin_t)(PluginInterface *plugin);
 
 struct LoadedPlugin
 {
 	std::string path;
 	HMODULE module;
+	Win32PluginInterface *pluginInterface;
 };
-static std::vector<LoadedPlugin> loadedPlugins;
+
+namespace
+{
+	CodeInjection::CodeAllocator codeAlloc;
+	CodeInjection::FuncInterceptor hook(&codeAlloc);
+	Win32TorqueFunctionInterceptor win32Interceptor(&hook);
+
+	HMODULE mathLib;
+	std::vector<LoadedPlugin> loadedPlugins;
+}
 
 static void loadPlugins()
 {
@@ -39,9 +45,9 @@ static void loadPlugins()
 
 		// Attempt to load the DLL
 		HMODULE plugin = LoadLibrary(pathBuf);
-		if (plugin != NULL)
+		if (plugin)
 		{
-			LoadedPlugin info = { pathBuf, plugin };
+			LoadedPlugin info = { pathBuf, plugin, new Win32PluginInterface(&win32Interceptor, pathBuf) };
 			loadedPlugins.push_back(info);
 		}
 		else
@@ -66,10 +72,10 @@ static void callPluginInit(const char *fnName)
 
 		// If it exports an initialization function, call it
 		auto initFunc = reinterpret_cast<initPlugin_t>(GetProcAddress(plugin.module, fnName));
-		if (initFunc != NULL)
-			initFunc(new Win32PluginInterface(&win32Interceptor, plugin.path.c_str()));
+		if (initFunc)
+			initFunc(plugin.pluginInterface);
 		else
-			TGE::Con::warnf("   WARNING: %s does not have a %s() function!", fnName, plugin.path);
+			TGE::Con::warnf("   WARNING: %s does not have a %s() function!", plugin.path.c_str(), fnName);
 	}
 }
 
@@ -107,18 +113,31 @@ static void setPluginVariables()
 
 static void loadMathLibrary()
 {
-	TGE::Con::printf("   Initializing plugin math library");
-	HMODULE mathLib = LoadLibrary("TorqueMath.dll");
-	if (mathLib != NULL)
+	TGE::Con::printf("   Initializing memory interface");
+	mathLib = LoadLibrary("TorqueLib.dll");
+	if (mathLib)
 	{
 		auto initFunc = reinterpret_cast<initMath_t>(GetProcAddress(mathLib, "init"));
-		if (initFunc != NULL)
+		if (initFunc)
 		{
 			initFunc();
 			return;
 		}
 	}
-	TGE::Con::errorf("   Unable to load TorqueMath.dll! Some plugins may fail to load!");
+	TGE::Con::errorf("   Unable to load TorqueLib.dll! Some plugins may fail to load!");
+}
+
+static void installUserOverrides()
+{
+	if (!mathLib)
+		return;
+
+	TGE::Con::printf("   Installing user overrides");
+	auto installFunc = reinterpret_cast<installOverrides_t>(GetProcAddress(mathLib, "installUserOverrides"));
+	if (installFunc)
+		installFunc(&win32Interceptor);
+	else
+		TGE::Con::errorf("   TorqueLib.dll is out-of-date and does not support user overrides!");
 }
 
 static auto originalNsInit = TGE::Namespace::init;
@@ -129,6 +148,7 @@ static void newNsInit()
 	TGE::Con::printf("MBExtender Init:");
 	loadMathLibrary();
 	loadPlugins();
+	installUserOverrides();
 	TGE::Con::printf("");
 	pluginPreInit();
 }
@@ -172,26 +192,6 @@ static bool verifyGame()
 	// Check if the string matches
 	if (memcmp(testPointer, testStr, strlen(testStr)) != 0)
 		return false;
-
-/*#ifdef NO_MBP
-	// This is "platinumbeta" XOR encrypted with "PQ" as the key
-	// We decrypt it and then check if the folder exists to see if the game is MBP or not
-	// Pretty basic, but it's not worth it to do anything more complicated
-	const char *mbpFolderEncrypted = " =1%9?%<24$0";
-	const size_t mbpFolderLength = 12;
-	char mbpFolderDecrypted[mbpFolderLength + 1];
-	for (int i = 0; i < mbpFolderLength; i += 2)
-	{
-		mbpFolderDecrypted[i] = mbpFolderEncrypted[i] ^ 'P';
-		mbpFolderDecrypted[i + 1] = mbpFolderEncrypted[i + 1] ^ 'Q';
-	}
-	mbpFolderDecrypted[mbpFolderLength] = '\0';
-
-	// Check if the folder exists
-	DWORD attributes = GetFileAttributes(mbpFolderDecrypted);
-	if (attributes != INVALID_FILE_ATTRIBUTES && attributes & FILE_ATTRIBUTE_DIRECTORY)
-		return false;
-#endif*/
 
 	return true;
 }

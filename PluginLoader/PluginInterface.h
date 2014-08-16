@@ -1,13 +1,14 @@
 #pragma once
 
-#include "TGE.h"
+#include "../TorqueLib/TGE.h"
+#include "../TorqueLib/QuickOverride.h"
 
-// Use this macro with the initPlugin() function
+// Use this macro with the preEngineInit() and postEngineInit() functions
 #ifdef _MSC_VER
-#define PLUGINAPI extern "C" __declspec(dllexport)
+#define PLUGINCALLBACK extern "C" __declspec(dllexport)
 #else
 // TODO: Implement this for GCC
-#define PLUGINAPI
+#define PLUGINCALLBACK
 #endif
 
 /// <summary>

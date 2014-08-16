@@ -166,13 +166,34 @@ inline double getMax(double a, double b)
 	return a>b ? a : b;
 }
 
-//------------------------------------------------------------------------------
-// Misc StdLib functions
 #define QSORT_CALLBACK __cdecl
-inline void dQsort(void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const void *, const void *))
+
+template <class T>
+inline T* constructInPlace(T* p)
 {
-	qsort(base, nelem, width, fcmp);
+	return new(p)T;
 }
 
+template <class T>
+inline T* constructInPlace(T* p, const T* copy)
+{
+	return new(p)T(*copy);
+}
+
+template <class T>
+inline void destructInPlace(T* p)
+{
+	p->~T();
+}
+
+namespace TGE
+{
+	struct FileInfo
+	{
+		const char* pFullPath;
+		const char* pFileName;
+		U32 fileSize;
+	};
+}
 
 #endif

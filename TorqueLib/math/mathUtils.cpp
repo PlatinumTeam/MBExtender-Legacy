@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "../platform/platform.h"
+#include "../TGE.h"
 #include "mathUtils.h"
 
 #include "mMath.h"
@@ -1142,7 +1143,7 @@ void sortQuadWindingOrder( bool clockwise, const Point3F *verts, U32 *vertMap, U
       sortPnt.theta = theta;
    }
 
-   dQsort( sortPoints, count, sizeof( QuadSortPoint ), clockwise ? cmpAngleDescending : cmpAngleAscending ); 
+   TGE::dQsort( sortPoints, count, sizeof( QuadSortPoint ), clockwise ? cmpAngleDescending : cmpAngleAscending ); 
 
    for ( S32 i = 0; i < count; i++ )
       vertMap[i] = sortPoints[i].id;

@@ -17,7 +17,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestPlugin", "TestPlugin\Te
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleSwag", "ConsoleSwag\ConsoleSwag.vcxproj", "{58866E24-C0B4-408E-A697-ADF3B88D04A4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TorqueMath", "TorqueMath\TorqueMath.vcxproj", "{235739A0-CCC8-4B33-84E2-9599D6B7D160}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TorqueLib", "TorqueLib\TorqueLib.vcxproj", "{235739A0-CCC8-4B33-84E2-9599D6B7D160}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RandomPowerupsDemo", "RandomPowerupsDemo\RandomPowerupsDemo.vcxproj", "{DFE632A3-BECE-43A1-9FEE-A12C4CF10E22}"
 EndProject

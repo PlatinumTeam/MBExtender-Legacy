@@ -22,8 +22,7 @@ WORD getAttributes(TGE::ConsoleLogEntry::Level level)
 	}
 }
 
-auto originalPrintf = TGE::Con::_printf;
-void newPrintf(TGE::ConsoleLogEntry::Level level, TGE::ConsoleLogEntry::Type type, const char *fmt, va_list argptr)
+TorqueOverride(void, Con::_printf, (TGE::ConsoleLogEntry::Level level, TGE::ConsoleLogEntry::Type type, const char *fmt, va_list argptr), originalPrintf)
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), getAttributes(level));
 	vprintf(fmt, argptr);
@@ -60,11 +59,7 @@ void inputThread()
 	}
 }
 
-PLUGINAPI void preEngineInit(PluginInterface *plugin)
-{
-}
-
-PLUGINAPI void postEngineInit(PluginInterface *plugin)
+PLUGINCALLBACK void preEngineInit(PluginInterface *plugin)
 {
 	// Set up a console window and redirect stdio to it
 	AllocConsole();
@@ -76,11 +71,10 @@ PLUGINAPI void postEngineInit(PluginInterface *plugin)
 
 	// Call our onClientProcess() function each tick
 	plugin->onClientProcess(onClientProcess);
+}
 
-	// Intercept Con::_printf because all console logging routines call it
-	TorqueFunctionInterceptor *interceptor = plugin->getInterceptor();
-	originalPrintf = interceptor->intercept(TGE::Con::_printf, newPrintf);
-
+PLUGINCALLBACK void postEngineInit(PluginInterface *plugin)
+{
 	// Create input-handling thread
 	std::thread(inputThread).detach();
 }
