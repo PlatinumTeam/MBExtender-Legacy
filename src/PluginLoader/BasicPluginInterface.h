@@ -2,6 +2,7 @@
 #define PLUGINLOADER_BASICPLUGININTERFACE_H
 
 #include <vector>
+#include <string>
 #include <PluginLoader/PluginInterface.h>
 #include "FuncInterceptor.h"
 
@@ -32,7 +33,7 @@ public:
 
 private:
 	BasicTorqueFunctionInterceptor *interceptor;
-	char *path;
+	std::string path;
 };
 
 #endif // PLUGINLOADER_BASICPLUGININTERFACE_H

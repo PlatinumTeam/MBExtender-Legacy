@@ -21,11 +21,8 @@ void* BasicTorqueFunctionInterceptor::intercept(void *func, void *newFunc)
 }
 
 BasicPluginInterface::BasicPluginInterface(BasicTorqueFunctionInterceptor *interceptor, const char *dllPath)
-	: interceptor(interceptor)
+	: interceptor(interceptor), path(dllPath)
 {
-	size_t pathLen = strlen(dllPath);
-	path = new char[pathLen];
-	memcpy(path, dllPath, pathLen + 1);
 }
 
 /// <summary>
@@ -34,7 +31,7 @@ BasicPluginInterface::BasicPluginInterface(BasicTorqueFunctionInterceptor *inter
 /// <returns></returns>
 const char* BasicPluginInterface::getPath()
 {
-	return path;
+	return path.c_str();
 }
 
 TorqueFunctionInterceptor* BasicPluginInterface::getInterceptor()

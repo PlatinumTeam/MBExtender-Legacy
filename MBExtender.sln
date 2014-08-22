@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MovingPlatformsFix", "plugi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RandomPowerupsDemo", "plugins\RandomPowerupsDemo\RandomPowerupsDemo.vcxproj", "{370E0D97-AB1B-4048-93EF-C85F7527423D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FakeVorbis", "src\FakeVorbis\FakeVorbis.vcxproj", "{A56BD4CA-18F8-4545-8D93-946EBCC53652}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -53,6 +55,10 @@ Global
 		{370E0D97-AB1B-4048-93EF-C85F7527423D}.Debug|Win32.Build.0 = Debug|Win32
 		{370E0D97-AB1B-4048-93EF-C85F7527423D}.Release|Win32.ActiveCfg = Release|Win32
 		{370E0D97-AB1B-4048-93EF-C85F7527423D}.Release|Win32.Build.0 = Release|Win32
+		{A56BD4CA-18F8-4545-8D93-946EBCC53652}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A56BD4CA-18F8-4545-8D93-946EBCC53652}.Debug|Win32.Build.0 = Debug|Win32
+		{A56BD4CA-18F8-4545-8D93-946EBCC53652}.Release|Win32.ActiveCfg = Release|Win32
+		{A56BD4CA-18F8-4545-8D93-946EBCC53652}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
