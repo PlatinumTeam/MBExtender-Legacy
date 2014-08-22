@@ -28,7 +28,7 @@ Running
 #### Windows ####
 There are two methods of activating the plugin loader on Windows.
 
-The preferred method is to use a proxy vorbis.dll (FakeVorbis), because it does not require administrator access in order to run the game. Open the folder with your marbleblast.exe file in it. Find vorbis.dll and rename it to "vorbis-real.dll". Then, copy vorbis.dll (built as part of MBExtender), PluginLoader.dll, and TorqueLib.dll to that folder, and place any plugin DLLs inside of a "plugins" folder.
+The preferred method is to use a proxy vorbis.dll (FakeVorbis), because it does not require administrator access in order to run the game. Open the folder with your marbleblast.exe file in it. Find vorbis.dll and rename it to "vorbis-real.dll". Then, copy vorbis.dll (built as part of MBExtender), PluginLoader.dll, and TorqueLib.dll to that folder, and place any plugin DLLs inside of a "plugins" folder. Run the game by simply launching marbleblast.exe.
 
 An external launcher similar to the one used on Linux is also available, but it requires administrator access. Copy MBExtender.exe, PluginLoader.dll, and TorqueLib.dll to the same folder as your marbleblast.exe file. Create a "plugins" folder and copy any plugin DLL files there. Run the game using MBExtender.exe.
 
