@@ -35,9 +35,10 @@ Sample Plugins
 --------------
 
 + *MovingPlatformsFix* - Fixes moving platforms in multiplayer
-+ *ConsoleSwag* - Creates an external console window for the game
++ *ExternalConsole* - Creates an external console window for the game
 + *RandomPowerupsDemo* - Causes powerups built into the game engine to have random effects when used
 + *TestPlugin* - Demonstration of how to create a simple plugin
++ *FakeIgnition* - (Linux only) Disables the game's ignition system
 
 Creating a New Plugin
 ---------------------
