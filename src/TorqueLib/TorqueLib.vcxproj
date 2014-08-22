@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{73FFCED1-24B5-40FA-B316-EB90F0FDEB5B}</ProjectGuid>
+    <RootNamespace>TorqueLib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)\include;$(SolutionDir)\include\TorqueLib\math;$(SolutionDir)\include\TorqueLib\math\util;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(SolutionDir)\include;$(SolutionDir)\include\TorqueLib\math;$(SolutionDir)\include\TorqueLib\math\util;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>HAVE_INTRIN_H;EXPORT_SYMBOLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>HAVE_INTRIN_H;EXPORT_SYMBOLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="math\mAngAxis.cpp" />
+    <ClCompile Include="math\mathUtils.cpp" />
+    <ClCompile Include="math\mBox.cpp" />
+    <ClCompile Include="math\mEase.cpp" />
+    <ClCompile Include="math\mMathAltivec.cpp" />
+    <ClCompile Include="math\mMathAMD.cpp" />
+    <ClCompile Include="math\mMathSSE.cpp" />
+    <ClCompile Include="math\mMath_C.cpp" />
+    <ClCompile Include="math\mMatrix.cpp" />
+    <ClCompile Include="math\mOrientedBox.cpp" />
+    <ClCompile Include="math\mPlane.cpp" />
+    <ClCompile Include="math\mPlaneTransformer.cpp" />
+    <ClCompile Include="math\mPoint.cpp" />
+    <ClCompile Include="math\mQuat.cpp" />
+    <ClCompile Include="math\mRandom.cpp" />
+    <ClCompile Include="math\mRect.cpp" />
+    <ClCompile Include="math\mSolver.cpp" />
+    <ClCompile Include="math\mSphere.cpp" />
+    <ClCompile Include="math\util\quadTransforms.cpp" />
+    <ClCompile Include="TorqueLib.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\TorqueLib\math\mAngAxis.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mathUtils.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mBox.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mBoxBase.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mConstants.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mEase.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mMath.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mMathFn.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mMatrix.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mOrientedBox.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mPlane.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mPlaneSet.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mPlaneTransformer.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mPoint2.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mPoint3.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mPoint4.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mQuat.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mRandom.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mRandomDeck.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mRandomSet.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mRect.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mSilhouetteExtractor.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mSphere.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\mTransform.h" />
+    <ClInclude Include="..\..\include\TorqueLib\math\util\quadTransforms.h" />
+    <ClInclude Include="..\..\include\TorqueLib\platform\platform.h" />
+    <ClInclude Include="..\..\include\TorqueLib\platform\platformAssert.h" />
+    <ClInclude Include="..\..\include\TorqueLib\QuickOverride.h" />
+    <ClInclude Include="..\..\include\TorqueLib\TGE.h" />
+    <ClInclude Include="..\..\include\TorqueLib\util\tVector.h" />
+    <ClInclude Include="..\..\include\TorqueLib\win32\Addresses-win32.h" />
+    <ClInclude Include="..\..\include\TorqueLib\win32\InterfaceMacros-win32.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
