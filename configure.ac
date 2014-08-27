@@ -40,9 +40,11 @@ case $host_cpu in
 esac
 AM_CONDITIONAL([X86], [test "x$CPU" = xx86])
 
+: ${CXXFLAGS="-g -O2"}
 CXXFLAGS="-m32 $CXXFLAGS"
-LDFLAGS="-m32 $LDFLAGS"
+CFLAGS="-m32 $CFLAGS"
 CCASFLAGS="-m32 $CCASFLAGS"
+LDFLAGS="-m32 $LDFLAGS"
 
 # Checks for programs.
 AC_PROG_CXX
@@ -52,9 +54,8 @@ AM_PROG_AS
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lboost_filesystem':
-AC_CHECK_LIB([boost_filesystem], [main])
-# FIXME: Replace `main' with a function in `-lboost_system':
-AC_CHECK_LIB([boost_system], [main])
+AC_CHECK_LIB([boost_filesystem], [main], [], [AC_MSG_ERROR([boost_filesystem is required])])
+AC_CHECK_LIB([boost_system], [main], [], [AC_MSG_ERROR([boost_filesystem is required])])
 AC_CHECK_LIB([dl], [dlopen])
 AC_CHECK_LIB([ws2_32], [WSAStartup])
 
@@ -67,15 +68,6 @@ AC_CHECK_HEADERS(
 		[intrin.h],
 		[],
 		[AC_MSG_ERROR([Either cpuid.h or intrin.h is required])]
-	)]
-)
-AC_CHECK_HEADERS(
-	[sys/select.h],
-	[],
-	[AC_CHECK_HEADERS(
-		[Winsock2.h],
-		[],
-		[AC_MSG_ERROR([Either sys/select.h or Winsock2.h is required])]
 	)]
 )
 

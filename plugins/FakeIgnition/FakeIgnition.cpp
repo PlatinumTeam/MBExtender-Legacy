@@ -33,6 +33,20 @@ namespace TGE
 	
 		FN(IgnitionStatus, validateIgnition, (), 0x821E184);
 	}
+	
+	class IgnitionObject
+	{
+	public:
+		MEMBERFNSIMP(void, updateValidationInfo, 0x814F310);
+	};
+	
+	namespace Members
+	{
+		namespace IgnitionObject
+		{
+			RAWMEMBERFNSIMP(TGE::IgnitionObject, void, updateValidationInfo, 0x814F310);
+		}
+	}
 }
 
 TorqueOverride(TGE::Auth::IgnitionStatus, Auth::validateIgnition, (), oldValidateIgnition)
@@ -40,6 +54,11 @@ TorqueOverride(TGE::Auth::IgnitionStatus, Auth::validateIgnition, (), oldValidat
 	// Make the game think that the ignition file has already been validated
 	TGE::Con::printf("FakeIgnition: forcing ignition validation status to ValidTicket");
 	return TGE::Auth::ValidTicket;
+}
+
+TorqueOverrideMember(void, IgnitionObject::updateValidationInfo, (TGE::IgnitionObject *thisObj), originalUpdateValidationInfo)
+{
+	return;
 }
 
 PLUGINCALLBACK void preEngineInit(PluginInterface *plugin)

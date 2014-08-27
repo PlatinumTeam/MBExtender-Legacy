@@ -44,14 +44,30 @@
 		}
 #endif
 
+// Defines the offset of a class's vtable pointer. Required in order to use VIRTFN and VIRTFNSIMP.	
+#define VTABLE(offset) \
+	uint32_t z_vtableLookup_(int index) \
+	{ \
+		return (*reinterpret_cast<uint32_t**>(reinterpret_cast<uint32_t>(this) + offset))[index]; \
+	}
+		
+// Defines a virtual function wrapper
+#define VIRTFN(rettype, name, args, argnames, index) \
+	MEMBERFN(rettype, name, args, argnames, z_vtableLookup_(index))
+
+// Same as VIRTFN, but defines a "simple" virtual function with no arguments
+#define VIRTFNSIMP(rettype, name, index) \
+	MEMBERFNSIMP(rettype, name, z_vtableLookup_(index))
+	
+// Defines a virtual destructor wrapper
+#define VIRTDTOR(name, index) \
+	MEMBERDTOR(name, z_vtableLookup_(index))
+
 // Defines an unnamed pure virtual function
 #define UNKVIRT(x) virtual void z_unk##x##_() = 0
 
 // Defines an undefined pure virtual function
 #define UNDEFVIRT(name) virtual void z_undef_##name##_() = 0
-
-// RTTI info
-#define RTTI_INFO
 
 // Defines a "raw" member function pointer
 #define RAWMEMBERFN(clazz, rettype, name, args, addr) static const auto name = (rettype (__thiscall *) (EXPAND(clazz *thisobj, EXPAND args)))addr
@@ -72,6 +88,13 @@
 	rettype name()                                           \
 	{                                                        \
 		return ((rettype (__thiscall *) (void*))addr)(this); \
+	}
+	
+// Defines a destructor wrapper
+#define MEMBERDTOR(name, addr)                     \
+	name()                                         \
+	{                                              \
+		((void (__thiscall *) (void*))addr)(this); \
 	}
 
 // Defines a global variable

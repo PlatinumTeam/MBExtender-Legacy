@@ -3,7 +3,7 @@
 SUBDIRS = include
 
 AM_LDFLAGS = -module -avoid-version
-AM_CXXFLAGS = -Iinclude
+AM_CXXFLAGS = -Iinclude -fvisibility=hidden
 
 helperdir = $(bindir)
 plugindir = $(bindir)/plugins

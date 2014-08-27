@@ -9,9 +9,13 @@
 // e.g.
 // PLUGINCALLBACK void preEngineInit(PluginInterface *plugin)
 #ifdef _MSC_VER
-#define PLUGINCALLBACK extern "C" __declspec(dllexport)
+	#define PLUGINCALLBACK extern "C" __declspec(dllexport)
 #else
-#define PLUGINCALLBACK extern "C"
+	#if __GNUC__ >= 4
+		#define PLUGINCALLBACK extern "C" __attribute__((visibility("default")))
+	#else
+		#define PLUGINCALLBACK
+	#endif
 #endif
 
 /// <summary>

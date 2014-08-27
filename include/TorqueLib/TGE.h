@@ -36,6 +36,8 @@ namespace TGE
 	class SimObject;
 	class BaseMatInstance;
 	class GameConnection;
+	class Camera;
+	class ResourceObject;
 	struct Move;
 }
 
@@ -53,9 +55,10 @@ namespace TGE
 	class ConsoleObject
 	{
 	public:
-		RTTI_INFO;
+		VTABLE(TGEOFF_CONSOLEOBJECT_VTABLE);
+		
 		UNDEFVIRT(getClassRep);
-		UNKVIRT(2); // virtual destructor
+		VIRTDTOR(~ConsoleObject, 1);
 		// NOTE: On the Mac version, there's another virtual function right here - seems to be another (?) virtual destructor
 	};
 
@@ -98,8 +101,8 @@ namespace TGE
 	class SceneObject: public NetObject
 	{
 	public:
-		virtual void disableCollision() = 0;
-		virtual void enableCollision() = 0;
+		VIRTFNSIMP(void, disableCollision, TGEVIRT_SCENEOBJECT_DISABLECOLLISION);
+		VIRTFNSIMP(void, enableCollision, TGEVIRT_SCENEOBJECT_ENABLECOLLISION);
 		UNDEFVIRT(isDisplacable);
 		UNDEFVIRT(getMomentum);
 		UNDEFVIRT(setMomentum);
@@ -170,7 +173,7 @@ namespace TGE
 		UNDEFVIRT(unmountImage);
 		UNDEFVIRT(getMuzzleVector);
 		UNDEFVIRT(getCameraParameters);
-		virtual void getCameraTransform(F32 *pos, MatrixF *mat) = 0;
+		VIRTFN(void, getCameraTransform, (F32 *pos, MatrixF *mat), (pos, mat), TGEVIRT_SHAPEBASE_GETCAMERATRANSFORM);
 		UNDEFVIRT(getEyeTransform);
 		UNDEFVIRT(getRetractionTransform);
 		UNDEFVIRT(getMountTransform);
@@ -213,10 +216,10 @@ namespace TGE
 		UNDEFVIRT(setHidden);
 	};
 
-	class DisplayDevice
+	// TODO: Convert this to use VIRTFN
+	/*class DisplayDevice
 	{
 	public:
-		RTTI_INFO;
 		virtual void initDevice() = 0;
 		virtual bool activate(U32 width, U32 height, U32 bpp, bool fullScreen) = 0;
 		virtual void shutdown() = 0;
@@ -232,12 +235,14 @@ namespace TGE
 
 	class OpenGLDevice : public DisplayDevice
 	{
-	};
+	};*/
 
 	class Marble: public ShapeBase
 	{
-	public:
-		// No virtual functions
+	};
+	
+	class Camera: public ShapeBase
+	{
 	};
 
 	struct Collision
@@ -291,16 +296,30 @@ namespace TGE
 	class Stream
 	{
 	public:
-		RTTI_INFO;
-		virtual ~Stream() = 0;
-		virtual bool _read(U32 size, void *buf) = 0;
-		virtual bool _write(U32 size, const void *buf) = 0;
-		virtual bool hasCapability(int capability) = 0; // TODO: Define Stream::Capability enum
-		virtual U32 getPosition() = 0;
-		virtual bool setPosition(U32 pos);
-		virtual U32 getStreamSize() = 0;
-		virtual void readString(char *str) = 0;
-		virtual void writeString(const char *str, S32 maxLength = 255) = 0;
+		VTABLE(TGEOFF_STREAM_VTABLE);
+		
+		/// Status constants for the stream
+		enum StreamStatus
+		{
+			Ok = 0,      ///< Ok!
+			IOError,     ///< Read or Write error
+			EOS,         ///< End of Stream reached (mostly for reads)
+			IllegalCall, ///< An unsupported operation used. Always w/ accompanied by AssertWarn
+			Closed,      ///< Tried to operate on a closed stream (or detached filter)
+			UnknownError ///< Catchall
+		};
+		
+		GETTERFN(StreamStatus, getStatus, TGEOFF_STREAM_STATUS);
+
+		VIRTDTOR(~Stream, TGEVIRT_STREAM_DTOR);
+		VIRTFN(bool, _read, (U32 size, void *buf), (size, buf), TGEVIRT_STREAM__READ);
+		VIRTFN(bool, _write, (U32 size, const void *buf), (size, buf), TGEVIRT_STREAM__WRITE);
+		VIRTFN(bool, hasCapability, (int capability), (capability), TGEVIRT_STREAM_HASCAPABILITY);
+		VIRTFNSIMP(U32, getPosition, TGEVIRT_STREAM_GETPOSITION);
+		VIRTFN(bool, setPosition, (U32 pos), (pos), TGEVIRT_STREAM_SETPOSITION);
+		VIRTFNSIMP(U32, getStreamSize, TGEVIRT_STREAM_GETSTREAMSIZE);
+		VIRTFN(void, readString, (char *str), (str), TGEVIRT_STREAM_READSTRING);
+		VIRTFN(void, writeString, (const char *str, S32 maxLength), (str, maxLength), TGEVIRT_STREAM_WRITESTRING);
 	};
 
 	class FileStream : public Stream
@@ -338,6 +357,12 @@ namespace TGE
 			FileRead = 1 << 0,
 			FileWrite = 1 << 1
 		};
+		
+		MEMBERFN(void, setStatus, (FileStatus status), (status), TGEADDR_FILE_SETSTATUS_1); // Technically supposed to be protected
+		GETTERFN(void*, getHandle, TGEOFF_FILE_HANDLE);
+		SETTERFN(void*, setHandle, TGEOFF_FILE_HANDLE);
+		GETTERFN(Capability, getCapabilities, TGEOFF_FILE_CAPABILITIES);
+		SETTERFN(Capability, setCapabilities, TGEOFF_FILE_CAPABILITIES);
 
 		MEMBERFN(FileStatus, open, (const char *filename, const AccessMode openMode), (filename, openMode), TGEADDR_FILE_OPEN);
 		MEMBERFNSIMP(U32, getPosition, TGEADDR_FILE_GETPOSITION);
@@ -348,12 +373,19 @@ namespace TGE
 		MEMBERFNSIMP(FileStatus, getStatus, TGEADDR_FILE_GETSTATUS);
 		MEMBERFN(FileStatus, read, (U32 size, char *dst, U32 *bytesRead), (size, dst, bytesRead), TGEADDR_FILE_READ);
 		MEMBERFN(FileStatus, write, (U32 size, const char *src, U32 *bytesWritten), (size, src, bytesWritten), TGEADDR_FILE_WRITE);
+	};
 
-		MEMBERFN(void, setStatus, (FileStatus status), (status), TGEADDR_FILE_SETSTATUS_1); // Technically supposed to be protected
-		GETTERFN(void*, getHandle, TGEOFF_FILE_HANDLE);
-		SETTERFN(void*, setHandle, TGEOFF_FILE_HANDLE);
-		GETTERFN(Capability, getCapabilities, TGEOFF_FILE_CAPABILITIES);
-		SETTERFN(Capability, setCapabilities, TGEOFF_FILE_CAPABILITIES);
+	class ResManager
+	{
+	public:
+		MEMBERFN(Stream*, openStream, (const char *path), (path), TGEADDR_RESMANAGER_OPENSTREAM_STR);
+		MEMBERFN(Stream*, openStream, (ResourceObject *obj), (obj), TGEADDR_RESMANAGER_OPENSTREAM_RESOURCEOBJECT);
+		MEMBERFN(void, closeStream, (Stream *stream), (stream), TGEADDR_RESMANAGER_CLOSESTREAM);
+		MEMBERFN(ResourceObject*, find, (const char *path), (path), TGEADDR_RESMANAGER_FIND);
+		MEMBERFN(U32, getSize, (const char *path), (path), TGEADDR_RESMANAGER_GETSIZE);
+		MEMBERFN(bool, getCrc, (const char *path, U32 &crc, U32 initialValue), (path, crc, initialValue), TGEADDR_RESMANAGER_GETCRC);
+		MEMBERFN(void, searchPath, (const char *path), (path), TGEADDR_RESMANAGER_SEARCHPATH);
+		MEMBERFN(bool, setModZip, (const char *path), (path), TGEADDR_RESMANAGER_SETMODZIP);
 	};
 
 	class ConnectionProtocol
@@ -466,13 +498,6 @@ namespace TGE
 		FN(bool,        expandScriptFilename, (char *filename, U32 size, const char *src),           TGEADDR_CON_EXPANDSCRIPTFILENAME);
 	}
 
-	// NOTE: THIS IS ONLY FOR WINDOWS. IT WILL BE DIFFERENT ON MAC AND LINUX.
-	struct FileTime
-	{
-		U32 low;
-		U32 high;
-	};
-
 	namespace Platform
 	{
 		FN(bool, dumpPath, (const char *path, Vector<FileInfo>& fileVector), TGEADDR_PLATFORM_DUMPPATH);
@@ -557,6 +582,24 @@ namespace TGE
 			RAWMEMBERFN(TGE::File, TGE::File::FileStatus, write, (U32 size, const char *src, U32 *bytesWritten), TGEADDR_FILE_WRITE);
 			RAWMEMBERFNSIMP(TGE::File, void, destructor_, TGEADDR_FILE_DTOR);
 		}
+		
+		namespace Camera
+		{
+			RAWMEMBERFN(TGE::Camera, void, advancePhysics, (const TGE::Move *move, U32 delta), TGEADDR_CAMERA_ADVANCEPHYSICS);
+		}
+		
+		namespace ResManager
+		{
+			// TODO: Allow overloading raw member pointers
+			/*RAWMEMBERFN(TGE::ResManager, Stream*, openStream, (const char *path), 0x407E37);
+			RAWMEMBERFN(TGE::ResManager, Stream*, openStream, (ResourceObject *obj), 0x4079EB);*/
+			RAWMEMBERFN(TGE::ResManager, void, closeStream, (Stream *stream), TGEADDR_RESMANAGER_CLOSESTREAM);
+			RAWMEMBERFN(TGE::ResManager, ResourceObject*, find, (const char *path), TGEADDR_RESMANAGER_FIND);
+			RAWMEMBERFN(TGE::ResManager, U32, getSize, (const char *path), TGEADDR_RESMANAGER_GETSIZE);
+			RAWMEMBERFN(TGE::ResManager, bool, getCrc, (const char *path, U32 &crc, U32 initialValue), TGEADDR_RESMANAGER_GETCRC);
+			RAWMEMBERFN(TGE::ResManager, void, searchPath, (const char *path), TGEADDR_RESMANAGER_SEARCHPATH);
+			RAWMEMBERFN(TGE::ResManager, bool, setModZip, (const char *path), TGEADDR_RESMANAGER_SETMODZIP);
+		}
 	}
 
 	FN(void, clientProcess, (U32 timeDelta), TGEADDR_CLIENTPROCESS);
@@ -570,6 +613,7 @@ namespace TGE
 	GLOBALVAR(Container, gClientContainer, TGEADDR_GCLIENTCONTAINER);
 	GLOBALVAR(Container, gServerContainer, TGEADDR_GSERVERCONTAINER);
 	GLOBALVAR(_StringTable*, StringTable, TGEADDR_STRINGTABLE);
+	GLOBALVAR(ResManager*, ResourceManager, TGEADDR_RESOURCEMANAGER);
 }
 
 // ConsoleFunction() can't be used from inside PluginLoader.dll without crashes

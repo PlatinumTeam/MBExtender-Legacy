@@ -11817,9 +11817,11 @@ else
 fi
 
 
+: ${CXXFLAGS="-g -O2"}
 CXXFLAGS="-m32 $CXXFLAGS"
-LDFLAGS="-m32 $LDFLAGS"
+CFLAGS="-m32 $CFLAGS"
 CCASFLAGS="-m32 $CCASFLAGS"
+LDFLAGS="-m32 $LDFLAGS"
 
 # Checks for programs.
 ac_ext=cpp
@@ -16442,9 +16444,10 @@ _ACEOF
 
   LIBS="-lboost_filesystem $LIBS"
 
+else
+  as_fn_error $? "boost_filesystem is required" "$LINENO" 5
 fi
 
-# FIXME: Replace `main' with a function in `-lboost_system':
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lboost_system" >&5
 $as_echo_n "checking for main in -lboost_system... " >&6; }
 if ${ac_cv_lib_boost_system_main+:} false; then :
@@ -16482,6 +16485,8 @@ _ACEOF
 
   LIBS="-lboost_system $LIBS"
 
+else
+  as_fn_error $? "boost_filesystem is required" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlopen in -ldl" >&5
@@ -16608,35 +16613,6 @@ _ACEOF
 
 else
   as_fn_error $? "Either cpuid.h or intrin.h is required" "$LINENO" 5
-
-fi
-
-done
-
-
-fi
-
-done
-
-for ac_header in sys/select.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "sys/select.h" "ac_cv_header_sys_select_h" "$ac_includes_default"
-if test "x$ac_cv_header_sys_select_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_SYS_SELECT_H 1
-_ACEOF
-
-else
-  for ac_header in Winsock2.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "Winsock2.h" "ac_cv_header_Winsock2_h" "$ac_includes_default"
-if test "x$ac_cv_header_Winsock2_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_WINSOCK2_H 1
-_ACEOF
-
-else
-  as_fn_error $? "Either sys/select.h or Winsock2.h is required" "$LINENO" 5
 
 fi
 

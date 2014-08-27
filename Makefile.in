@@ -532,7 +532,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = include
 AM_LDFLAGS = -module -avoid-version
-AM_CXXFLAGS = -Iinclude
+AM_CXXFLAGS = -Iinclude -fvisibility=hidden
 helperdir = $(bindir)
 plugindir = $(bindir)/plugins
 @LINUX_TRUE@MBExtender_SOURCES = \

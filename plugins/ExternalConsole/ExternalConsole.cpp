@@ -96,13 +96,13 @@ PLUGINCALLBACK void preEngineInit(PluginInterface *plugin)
 	freopen("CONOUT$", "w", stderr);
 	std::ios::sync_with_stdio();
 #endif
-
-	// Call our onClientProcess() function each tick
-	plugin->onClientProcess(onClientProcess);
 }
 
 PLUGINCALLBACK void postEngineInit(PluginInterface *plugin)
 {
+	// Call our onClientProcess() function each tick
+	plugin->onClientProcess(onClientProcess);
+	
 	// Create input-handling thread
 	std::thread(inputThread).detach();
 }

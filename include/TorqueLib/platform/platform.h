@@ -7,13 +7,17 @@
 #include <cstdint>
 
 #ifdef _MSC_VER
-#ifdef EXPORT_SYMBOLS
-#define DLLSPEC __declspec(dllexport)
+	#ifdef EXPORT_SYMBOLS
+		#define DLLSPEC __declspec(dllexport)
+	#else
+		#define DLLSPEC __declspec(dllimport)
+	#endif
 #else
-#define DLLSPEC __declspec(dllimport)
-#endif
-#else
-#define DLLSPEC
+	#if __GNUC__ >= 4
+		#define DLLSPEC __attribute__((visibility("default")))
+	#else
+		#define DLLSPEC
+	#endif
 #endif
 
 //------------------------------------------------------------------------------
@@ -198,6 +202,17 @@ namespace TGE
 		const char* pFileName;
 		U32 fileSize;
 	};
+	
+#ifdef _WIN32
+	struct FileTime
+	{
+		U32 low;
+		U32 high;
+	};
+#endif
+#ifdef __linux
+	typedef S32 FileTime;
+#endif
 }
 
 #endif
