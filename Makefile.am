@@ -29,7 +29,8 @@ plugin_LTLIBRARIES = \
 	TestPlugin.la \
 	RandomPowerupsDemo.la \
 	ExternalConsole.la \
-	MovingPlatformsFix.la
+	MovingPlatformsFix.la \
+	MultiplayerFix.la
 
 PluginLoader_la_SOURCES = \
 	src/PluginLoader/CodeAllocator.cpp \
@@ -98,6 +99,9 @@ ExternalConsole_la_SOURCES = \
 	
 MovingPlatformsFix_la_SOURCES = \
 	plugins/MovingPlatformsFix/MovingPlatformsFix.cpp
+	
+MultiplayerFix_la_SOURCES = \
+	plugins/MultiplayerFix/MultiplayerFix.cpp
 	
 ## Only compile FakeIgnition on Linux
 if LINUX

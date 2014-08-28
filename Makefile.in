@@ -168,6 +168,10 @@ MovingPlatformsFix_la_LIBADD =
 am_MovingPlatformsFix_la_OBJECTS =  \
 	plugins/MovingPlatformsFix/MovingPlatformsFix.lo
 MovingPlatformsFix_la_OBJECTS = $(am_MovingPlatformsFix_la_OBJECTS)
+MultiplayerFix_la_LIBADD =
+am_MultiplayerFix_la_OBJECTS =  \
+	plugins/MultiplayerFix/MultiplayerFix.lo
+MultiplayerFix_la_OBJECTS = $(am_MultiplayerFix_la_OBJECTS)
 PluginLoader_la_LIBADD =
 am__PluginLoader_la_SOURCES_DIST = src/PluginLoader/CodeAllocator.cpp \
 	src/PluginLoader/CodeAllocator.h \
@@ -313,12 +317,13 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(ExternalConsole_la_SOURCES) $(FakeIgnition_la_SOURCES) \
-	$(MovingPlatformsFix_la_SOURCES) $(PluginLoader_la_SOURCES) \
-	$(RandomPowerupsDemo_la_SOURCES) $(TestPlugin_la_SOURCES) \
-	$(TorqueLib_la_SOURCES) $(MBExtender_SOURCES)
+	$(MovingPlatformsFix_la_SOURCES) $(MultiplayerFix_la_SOURCES) \
+	$(PluginLoader_la_SOURCES) $(RandomPowerupsDemo_la_SOURCES) \
+	$(TestPlugin_la_SOURCES) $(TorqueLib_la_SOURCES) \
+	$(MBExtender_SOURCES)
 DIST_SOURCES = $(ExternalConsole_la_SOURCES) \
 	$(am__FakeIgnition_la_SOURCES_DIST) \
-	$(MovingPlatformsFix_la_SOURCES) \
+	$(MovingPlatformsFix_la_SOURCES) $(MultiplayerFix_la_SOURCES) \
 	$(am__PluginLoader_la_SOURCES_DIST) \
 	$(RandomPowerupsDemo_la_SOURCES) $(TestPlugin_la_SOURCES) \
 	$(TorqueLib_la_SOURCES) $(am__MBExtender_SOURCES_DIST)
@@ -548,7 +553,8 @@ helper_LTLIBRARIES = \
 	TorqueLib.la
 
 plugin_LTLIBRARIES = TestPlugin.la RandomPowerupsDemo.la \
-	ExternalConsole.la MovingPlatformsFix.la $(am__append_3)
+	ExternalConsole.la MovingPlatformsFix.la MultiplayerFix.la \
+	$(am__append_3)
 PluginLoader_la_SOURCES = src/PluginLoader/CodeAllocator.cpp \
 	src/PluginLoader/CodeAllocator.h \
 	src/PluginLoader/CodeInjectionStream.cpp \
@@ -597,6 +603,9 @@ ExternalConsole_la_SOURCES = \
 
 MovingPlatformsFix_la_SOURCES = \
 	plugins/MovingPlatformsFix/MovingPlatformsFix.cpp
+
+MultiplayerFix_la_SOURCES = \
+	plugins/MultiplayerFix/MultiplayerFix.cpp
 
 @LINUX_TRUE@FakeIgnition_la_SOURCES = \
 @LINUX_TRUE@	plugins/FakeIgnition/FakeIgnition.cpp
@@ -761,6 +770,18 @@ plugins/MovingPlatformsFix/MovingPlatformsFix.lo:  \
 
 MovingPlatformsFix.la: $(MovingPlatformsFix_la_OBJECTS) $(MovingPlatformsFix_la_DEPENDENCIES) $(EXTRA_MovingPlatformsFix_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(CXXLINK) -rpath $(plugindir) $(MovingPlatformsFix_la_OBJECTS) $(MovingPlatformsFix_la_LIBADD) $(LIBS)
+plugins/MultiplayerFix/$(am__dirstamp):
+	@$(MKDIR_P) plugins/MultiplayerFix
+	@: > plugins/MultiplayerFix/$(am__dirstamp)
+plugins/MultiplayerFix/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) plugins/MultiplayerFix/$(DEPDIR)
+	@: > plugins/MultiplayerFix/$(DEPDIR)/$(am__dirstamp)
+plugins/MultiplayerFix/MultiplayerFix.lo:  \
+	plugins/MultiplayerFix/$(am__dirstamp) \
+	plugins/MultiplayerFix/$(DEPDIR)/$(am__dirstamp)
+
+MultiplayerFix.la: $(MultiplayerFix_la_OBJECTS) $(MultiplayerFix_la_DEPENDENCIES) $(EXTRA_MultiplayerFix_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(CXXLINK) -rpath $(plugindir) $(MultiplayerFix_la_OBJECTS) $(MultiplayerFix_la_LIBADD) $(LIBS)
 src/PluginLoader/$(am__dirstamp):
 	@$(MKDIR_P) src/PluginLoader
 	@: > src/PluginLoader/$(am__dirstamp)
@@ -1008,6 +1029,8 @@ mostlyclean-compile:
 	-rm -f plugins/FakeIgnition/*.lo
 	-rm -f plugins/MovingPlatformsFix/*.$(OBJEXT)
 	-rm -f plugins/MovingPlatformsFix/*.lo
+	-rm -f plugins/MultiplayerFix/*.$(OBJEXT)
+	-rm -f plugins/MultiplayerFix/*.lo
 	-rm -f plugins/RandomPowerupsDemo/*.$(OBJEXT)
 	-rm -f plugins/RandomPowerupsDemo/*.lo
 	-rm -f plugins/TestPlugin/*.$(OBJEXT)
@@ -1033,6 +1056,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@plugins/ExternalConsole/$(DEPDIR)/ExternalConsole.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@plugins/FakeIgnition/$(DEPDIR)/FakeIgnition.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@plugins/MovingPlatformsFix/$(DEPDIR)/MovingPlatformsFix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@plugins/MultiplayerFix/$(DEPDIR)/MultiplayerFix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@plugins/RandomPowerupsDemo/$(DEPDIR)/RandomPowerupsDemo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@plugins/TestPlugin/$(DEPDIR)/TestPlugin.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/MBExtender/linux/$(DEPDIR)/main-linux.Po@am__quote@
@@ -1336,6 +1360,7 @@ clean-libtool:
 	-rm -rf plugins/ExternalConsole/.libs plugins/ExternalConsole/_libs
 	-rm -rf plugins/FakeIgnition/.libs plugins/FakeIgnition/_libs
 	-rm -rf plugins/MovingPlatformsFix/.libs plugins/MovingPlatformsFix/_libs
+	-rm -rf plugins/MultiplayerFix/.libs plugins/MultiplayerFix/_libs
 	-rm -rf plugins/RandomPowerupsDemo/.libs plugins/RandomPowerupsDemo/_libs
 	-rm -rf plugins/TestPlugin/.libs plugins/TestPlugin/_libs
 	-rm -rf src/PluginLoader/.libs src/PluginLoader/_libs
@@ -1682,6 +1707,8 @@ distclean-generic:
 	-rm -f plugins/FakeIgnition/$(am__dirstamp)
 	-rm -f plugins/MovingPlatformsFix/$(DEPDIR)/$(am__dirstamp)
 	-rm -f plugins/MovingPlatformsFix/$(am__dirstamp)
+	-rm -f plugins/MultiplayerFix/$(DEPDIR)/$(am__dirstamp)
+	-rm -f plugins/MultiplayerFix/$(am__dirstamp)
 	-rm -f plugins/RandomPowerupsDemo/$(DEPDIR)/$(am__dirstamp)
 	-rm -f plugins/RandomPowerupsDemo/$(am__dirstamp)
 	-rm -f plugins/TestPlugin/$(DEPDIR)/$(am__dirstamp)
@@ -1713,7 +1740,7 @@ clean-am: clean-binPROGRAMS clean-generic clean-helperLTLIBRARIES \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf plugins/ExternalConsole/$(DEPDIR) plugins/FakeIgnition/$(DEPDIR) plugins/MovingPlatformsFix/$(DEPDIR) plugins/RandomPowerupsDemo/$(DEPDIR) plugins/TestPlugin/$(DEPDIR) src/MBExtender/linux/$(DEPDIR) src/MBExtender/win32/$(DEPDIR) src/PluginLoader/$(DEPDIR) src/PluginLoader/unix/$(DEPDIR) src/PluginLoader/win32/$(DEPDIR) src/TorqueLib/$(DEPDIR) src/TorqueLib/math/$(DEPDIR) src/TorqueLib/math/util/$(DEPDIR)
+	-rm -rf plugins/ExternalConsole/$(DEPDIR) plugins/FakeIgnition/$(DEPDIR) plugins/MovingPlatformsFix/$(DEPDIR) plugins/MultiplayerFix/$(DEPDIR) plugins/RandomPowerupsDemo/$(DEPDIR) plugins/TestPlugin/$(DEPDIR) src/MBExtender/linux/$(DEPDIR) src/MBExtender/win32/$(DEPDIR) src/PluginLoader/$(DEPDIR) src/PluginLoader/unix/$(DEPDIR) src/PluginLoader/win32/$(DEPDIR) src/TorqueLib/$(DEPDIR) src/TorqueLib/math/$(DEPDIR) src/TorqueLib/math/util/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -1762,7 +1789,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf plugins/ExternalConsole/$(DEPDIR) plugins/FakeIgnition/$(DEPDIR) plugins/MovingPlatformsFix/$(DEPDIR) plugins/RandomPowerupsDemo/$(DEPDIR) plugins/TestPlugin/$(DEPDIR) src/MBExtender/linux/$(DEPDIR) src/MBExtender/win32/$(DEPDIR) src/PluginLoader/$(DEPDIR) src/PluginLoader/unix/$(DEPDIR) src/PluginLoader/win32/$(DEPDIR) src/TorqueLib/$(DEPDIR) src/TorqueLib/math/$(DEPDIR) src/TorqueLib/math/util/$(DEPDIR)
+	-rm -rf plugins/ExternalConsole/$(DEPDIR) plugins/FakeIgnition/$(DEPDIR) plugins/MovingPlatformsFix/$(DEPDIR) plugins/MultiplayerFix/$(DEPDIR) plugins/RandomPowerupsDemo/$(DEPDIR) plugins/TestPlugin/$(DEPDIR) src/MBExtender/linux/$(DEPDIR) src/MBExtender/win32/$(DEPDIR) src/PluginLoader/$(DEPDIR) src/PluginLoader/unix/$(DEPDIR) src/PluginLoader/win32/$(DEPDIR) src/TorqueLib/$(DEPDIR) src/TorqueLib/math/$(DEPDIR) src/TorqueLib/math/util/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
