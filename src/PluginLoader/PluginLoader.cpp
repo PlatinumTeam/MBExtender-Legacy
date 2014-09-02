@@ -49,9 +49,9 @@ namespace
 			if (path.extension() != SharedObject::DefaultExtension)
 				continue;
 			
-			const char *pathStr = path.generic_string().c_str();
-			TGE::Con::printf("   Loading %s", pathStr);
-			SharedObject *library = new SharedObject(pathStr);
+			std::string pathStr = path.generic_string();
+			TGE::Con::printf("   Loading %s", pathStr.c_str());
+			SharedObject *library = new SharedObject(pathStr.c_str());
 			if (library->loaded())
 			{
 				LoadedPlugin info = { path, library, new BasicPluginInterface(basicInterceptor, pathStr) };

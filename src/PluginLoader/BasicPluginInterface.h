@@ -23,7 +23,7 @@ private:
 class BasicPluginInterface : public PluginInterface
 {
 public:
-	BasicPluginInterface(BasicTorqueFunctionInterceptor *interceptor, const char *dllPath);
+	BasicPluginInterface(BasicTorqueFunctionInterceptor *interceptor, const std::string &dllPath);
 
 	const char* getPath();
 	TorqueFunctionInterceptor* getInterceptor();

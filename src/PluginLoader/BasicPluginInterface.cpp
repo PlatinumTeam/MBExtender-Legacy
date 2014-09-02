@@ -20,7 +20,7 @@ void* BasicTorqueFunctionInterceptor::intercept(void *func, void *newFunc)
 	return interceptor->intercept(func, newFunc);
 }
 
-BasicPluginInterface::BasicPluginInterface(BasicTorqueFunctionInterceptor *interceptor, const char *dllPath)
+BasicPluginInterface::BasicPluginInterface(BasicTorqueFunctionInterceptor *interceptor, const std::string &dllPath)
 	: interceptor(interceptor), path(dllPath)
 {
 }
