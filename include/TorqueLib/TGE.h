@@ -605,7 +605,7 @@ namespace TGE
 	FN(void, clientProcess, (U32 timeDelta), TGEADDR_CLIENTPROCESS);
 
 	// Platform functions
-	FN(void, dSprintf, (char *buffer, size_t bufferSize, const char *format, ...), TGEADDR_DSPRINTF);
+	FN(int, dSprintf, (char *buffer, size_t bufferSize, const char *format, ...), TGEADDR_DSPRINTF);
 	FN(void, dFree, (void *ptr), TGEADDR_DFREE);
 	FN(void, dQsort, (void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const void*, const void*)), TGEADDR_DQSORT);
 	FN(bool, VectorResize, (U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount, U32 elemSize), TGEADDR_VECTORRESIZE);
