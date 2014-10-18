@@ -87,11 +87,14 @@
 	rettype name args
 
 // Defines a getter for a class field
-#define GETTERFN(type, name, offset)                                             \
-	type name()                                                                  \
-	{                                                                            \
-		return *reinterpret_cast<type*>(reinterpret_cast<char*>(this) + offset); \
+#define GETTERFN(rettype, internaltype, name, offset)                                    \
+	rettype name()                                                                       \
+	{                                                                                    \
+		return *reinterpret_cast<internaltype*>(reinterpret_cast<char*>(this) + offset); \
 	}
+
+// Defines a getter for a class field where the return type and internal type are the same
+#define GETTERFNSIMP(type, name, offset) GETTERFN(type, type, name, offset)
 
 // Defines a setter for a class field
 #define SETTERFN(type, name, offset)                                                 \

@@ -49,6 +49,7 @@ typedef void        (*VoidCallback)  (TGE::SimObject *obj, S32 argc, const char 
 typedef bool        (*BoolCallback)  (TGE::SimObject *obj, S32 argc, const char *argv[]);
 
 typedef U32 SimObjectId;
+typedef S32 NetSocket;
 
 namespace TGE
 {
@@ -65,7 +66,7 @@ namespace TGE
 	class SimObject: public ConsoleObject
 	{
 	public:
-		GETTERFN(SimObjectId, getId, TGEOFF_SIMOBJECT_ID);
+		GETTERFNSIMP(SimObjectId, getId, TGEOFF_SIMOBJECT_ID);
 		MEMBERFNSIMP(const char*, getIdString, TGEADDR_SIMOBJECT_GETIDSTRING);
 		MEMBERFN(void, setHidden, (bool hidden), (hidden), TGEADDR_SIMOBJECT_SETHIDDEN);
 
@@ -108,7 +109,7 @@ namespace TGE
 		UNDEFVIRT(setMomentum);
 		UNDEFVIRT(getMass);
 		UNDEFVIRT(displaceObject);
-		UNDEFVIRT(setTransform);
+		VIRTFN(void, setTransform, (const MatrixF &transform), (transform), TGEVIRT_SCENEOBJECT_SETTRANSFORM);
 		UNDEFVIRT(setScale);
 		UNDEFVIRT(setRenderTransform);
 		UNDEFVIRT(buildConvex);
@@ -134,12 +135,15 @@ namespace TGE
 		UNDEFVIRT(installLights);
 		UNDEFVIRT(uninstallLights);
 		UNDEFVIRT(getLightingAmbientColor);
+
+		GETTERFN(const MatrixF &, MatrixF, getTransform, TGEOFF_SCENEOBJECT_TRANSFORM);
+		GETTERFN(const Box3F &, Box3F, getWorldBox, TGEOFF_SCENEOBJECT_WORLDBOX);
 	};
 
 	class GameBase : public SceneObject
 	{
 	public:
-		GETTERFN(GameConnection*, getControllingClient, TGEOFF_GAMEBASE_CONTROLLINGCLIENT);
+		GETTERFNSIMP(GameConnection*, getControllingClient, TGEOFF_GAMEBASE_CONTROLLINGCLIENT);
 
 		UNDEFVIRT(onNewDataBlock);
 		UNDEFVIRT(processTick);
@@ -309,7 +313,7 @@ namespace TGE
 			UnknownError ///< Catchall
 		};
 		
-		GETTERFN(StreamStatus, getStatus, TGEOFF_STREAM_STATUS);
+		GETTERFNSIMP(StreamStatus, getStatus, TGEOFF_STREAM_STATUS);
 
 		VIRTDTOR(~Stream, TGEVIRT_STREAM_DTOR);
 		VIRTFN(bool, _read, (U32 size, void *buf), (size, buf), TGEVIRT_STREAM__READ);
@@ -359,9 +363,9 @@ namespace TGE
 		};
 		
 		MEMBERFN(void, setStatus, (FileStatus status), (status), TGEADDR_FILE_SETSTATUS_1); // Technically supposed to be protected
-		GETTERFN(void*, getHandle, TGEOFF_FILE_HANDLE);
+		GETTERFNSIMP(void*, getHandle, TGEOFF_FILE_HANDLE);
 		SETTERFN(void*, setHandle, TGEOFF_FILE_HANDLE);
-		GETTERFN(Capability, getCapabilities, TGEOFF_FILE_CAPABILITIES);
+		GETTERFNSIMP(Capability, getCapabilities, TGEOFF_FILE_CAPABILITIES);
 		SETTERFN(Capability, setCapabilities, TGEOFF_FILE_CAPABILITIES);
 
 		MEMBERFN(FileStatus, open, (const char *filename, const AccessMode openMode), (filename, openMode), TGEADDR_FILE_OPEN);
@@ -421,7 +425,7 @@ namespace TGE
 	class AbstractClassRep
 	{
 	public:
-		GETTERFN(const char*, getClassName, TGEOFF_ABSTRACTCLASSREP_CLASSNAME);
+		GETTERFNSIMP(const char*, getClassName, TGEOFF_ABSTRACTCLASSREP_CLASSNAME);
 	};
 
 	class _StringTable
@@ -536,7 +540,18 @@ namespace TGE
 
 	namespace Net
 	{
+		enum Error
+		{
+			NoError,
+			WrongProtocolType,
+			InvalidPacketProtocol,
+			WouldBlock,
+			NotASocket,
+			UnknownError
+		};
+
 		FN(bool, init, (), TGEADDR_NET_INIT);
+		FN(Error, bind, (NetSocket socket, U16 port), TGEADDR_NET_BIND);
 	}
 
 	namespace Members

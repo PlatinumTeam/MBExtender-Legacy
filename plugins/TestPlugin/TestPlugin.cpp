@@ -35,6 +35,19 @@ ConsoleFunction(idTest, void, 2, 2, "idTest(obj)")
 	TGE::Con::printf("getIdString() -> \"%s\"", obj->getIdString());
 }
 
+ConsoleFunction(transformTest, void, 2, 2, "transformTest(obj)")
+{
+	TGE::SceneObject *obj = static_cast<TGE::SceneObject*>(TGE::Sim::findObject(argv[1]));
+	const MatrixF &mat = obj->getTransform();
+	for (int i = 0; i < 4; i++)
+		TGE::Con::printf("%f %f %f %f", mat(i, 0), mat(i, 1), mat(i, 2), mat(i, 3));
+	obj->setTransform(mat);
+
+	const Box3F &box = obj->getWorldBox();
+	Point3F center = box.getCenter();
+	TGE::Con::printf("Box center: %f %f %f", center.x, center.y, center.z);
+}
+
 bool initializingClasses = false;
 
 TorqueOverride(void, Members::AbstractClassRep::initialize, (), originalInitialize)
