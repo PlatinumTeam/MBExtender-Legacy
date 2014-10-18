@@ -14,13 +14,20 @@ A 32-bit version of [Boost](http://www.boost.org/) (specifically, [Boost.Filesys
 Visual Studio 2013 is required to compile MBExtender on Windows. Open MBExtender.sln, select either Debug or Release mode, and then click Build -> Build Solution. Binaries will be found in a folder in the solution directory corresponding to the configuration you chose (either Debug or Release). Plugins will be in the "plugins" folder inside of it.
 
 #### Linux ####
-A standard G++ installation supporting -std=c++11 is required to compile MBExtender on Linux. Open a shell and run the following commands:
+A standard G++ installation supporting -std=c++11 is required to compile MBExtender on Linux. To compile a basic debug build, open a shell and run the following commands:
 ```
-$ ./configure "--prefix=$PWD/release"
+$ ./configure --prefix="$PWD/debug"
 $ make
 $ make install
 ```
-If all goes well, MBExtender's files will be installed to a "release" folder in the current directory. Binaries can be found in the "bin" directory inside of it.
+If all goes well, MBExtender's files will be installed to a "debug" folder in the current directory. Binaries can be found in the "bin" directory inside of it.
+
+To create a release build, you may wish to run these commands to create stripped executables without debug information:
+```
+$ ./configure --prefix="$PWD/release" CXXFLAGS=-O2
+$ make
+$ make install-strip
+```
 
 Running
 -------
