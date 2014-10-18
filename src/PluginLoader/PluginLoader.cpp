@@ -60,7 +60,7 @@ namespace
 			else
 			{
 				delete library;
-				TGE::Con::errorf("   Unable to load %s!", pathStr);
+				TGE::Con::errorf("   Unable to load %s!", pathStr.c_str());
 			}
 		}
 	}
