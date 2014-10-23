@@ -72,15 +72,15 @@ namespace
 		TGE::Con::printf("%s", message);
 		for (auto &plugin : *loadedPlugins)
 		{
-			const char *pathStr = plugin.path.generic_string().c_str();
-			TGE::Con::printf("   Initializing %s", pathStr);
+			std::string pathStr = plugin.path.generic_string();
+			TGE::Con::printf("   Initializing %s", pathStr.c_str());
 
 			// If it exports an initialization function, call it
 			auto initFunc = reinterpret_cast<initPlugin_t>(plugin.library->getSymbol(fnName));
 			if (initFunc)
 				initFunc(plugin.pluginInterface);
 			else
-				TGE::Con::warnf("   WARNING: %s does not have a %s() function!", pathStr, fnName);
+				TGE::Con::warnf("   WARNING: %s does not have a %s() function!", pathStr.c_str(), fnName);
 		}
 		TGE::Con::printf("");
 	}
