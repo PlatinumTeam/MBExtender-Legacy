@@ -434,6 +434,44 @@ namespace TGE
 		MEMBERFN(const char*, insert, (const char *string, bool caseSens), (string, caseSens), TGEADDR__STRINGTABLE_INSERT);
 	};
 
+	// Event types
+	enum EventType
+	{
+		TimeEventType = 3,
+	};
+
+	// Event base structure
+	struct Event
+	{
+		U16 type;
+		U16 size;
+
+		Event()
+		{
+			size = sizeof(Event);
+		}
+	};
+
+	// Structure for time events
+	struct TimeEvent : public Event
+	{
+		U32 deltaTime;
+
+		TimeEvent()
+		{
+			type = TimeEventType;
+			size = sizeof(TimeEvent);
+		}
+	};
+
+	class GameInterface
+	{
+	public:
+		VTABLE(TGEOFF_GAMEINTERFACE_VTABLE);
+
+		VIRTFN(void, postEvent, (Event &ev), (ev), TGEVIRT_GAMEINTERFACE_POSTEVENT);
+	};
+
 	// Console enums
 	namespace ConsoleLogEntry
 	{
@@ -554,6 +592,11 @@ namespace TGE
 		FN(Error, bind, (NetSocket socket, U16 port), TGEADDR_NET_BIND);
 	}
 
+	namespace TimeManager
+	{
+		FN(void, process, (), TGEADDR_TIMEMANAGER_PROCESS);
+	}
+
 	namespace Members
 	{
 		/*namespace OpenGLDevice
@@ -630,6 +673,7 @@ namespace TGE
 	GLOBALVAR(Container, gServerContainer, TGEADDR_GSERVERCONTAINER);
 	GLOBALVAR(_StringTable*, StringTable, TGEADDR_STRINGTABLE);
 	GLOBALVAR(ResManager*, ResourceManager, TGEADDR_RESOURCEMANAGER);
+	GLOBALVAR(GameInterface*, Game, TGEADDR_GAME);
 }
 
 // ConsoleFunction() can't be used from inside PluginLoader.dll without crashes

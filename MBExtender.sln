@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MBExtender", "src\MBExtender\win32\MBExtender.vcxproj", "{323BB651-4ACE-4FD7-8DF3-512BA23A3116}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RandomPowerupsDemo", "plugins\RandomPowerupsDemo\RandomPowerupsDemo.vcxproj", "{370E0D97-AB1B-4048-93EF-C85F7527423D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FakeVorbis", "src\FakeVorbis\FakeVorbis.vcxproj", "{A56BD4CA-18F8-4545-8D93-946EBCC53652}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FrameRateUnlock", "plugins\FrameRateUnlock\FrameRateUnlock.vcxproj", "{FBAF6AE7-153C-4182-9DBE-1B0AE45E90AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{A56BD4CA-18F8-4545-8D93-946EBCC53652}.Debug|Win32.Build.0 = Debug|Win32
 		{A56BD4CA-18F8-4545-8D93-946EBCC53652}.Release|Win32.ActiveCfg = Release|Win32
 		{A56BD4CA-18F8-4545-8D93-946EBCC53652}.Release|Win32.Build.0 = Release|Win32
+		{FBAF6AE7-153C-4182-9DBE-1B0AE45E90AF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FBAF6AE7-153C-4182-9DBE-1B0AE45E90AF}.Debug|Win32.Build.0 = Debug|Win32
+		{FBAF6AE7-153C-4182-9DBE-1B0AE45E90AF}.Release|Win32.ActiveCfg = Release|Win32
+		{FBAF6AE7-153C-4182-9DBE-1B0AE45E90AF}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,5 +74,6 @@ Global
 		{FA7B05A1-04CB-421E-A9A4-E8C76B398B57} = {6E5F31A0-E405-418F-A543-21475A5E5E5E}
 		{501822C0-E2BA-4767-A2EA-099FD85A7BA0} = {6E5F31A0-E405-418F-A543-21475A5E5E5E}
 		{370E0D97-AB1B-4048-93EF-C85F7527423D} = {6E5F31A0-E405-418F-A543-21475A5E5E5E}
+		{FBAF6AE7-153C-4182-9DBE-1B0AE45E90AF} = {6E5F31A0-E405-418F-A543-21475A5E5E5E}
 	EndGlobalSection
 EndGlobal
