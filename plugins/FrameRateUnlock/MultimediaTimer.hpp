@@ -28,15 +28,16 @@ public:
 	int getResolution() const { return resolution; }
 		
 	/// <summary>
-	/// Gets the amount of time elapsed since the last time <see cref="update"/> was called, in milliseconds.
+	/// Gets the amount of time elapsed since the last frame, in milliseconds.
 	/// </summary>
-	/// <returns>The amount of time elapsed since the last time <see cref="update"/> was called, in milliseconds.</returns>
+	/// <returns>The amount of time elapsed since the last frame, in milliseconds.</returns>
 	uint32_t getElapsedTimeMs();
 
 	/// <summary>
-	/// Updates the timer such that subsequent calls to <see cref="getElapsedTimeMs"/> will return the amount of time elapsed since the most recent update.
+	/// Updates the timer after a frame update.
 	/// </summary>
-	void update();
+	/// <param name="elapsed">The amount of time elapsed since the last frame, in milliseconds.</param>
+	void update(uint32_t elapsed);
 
 private:	
 	/// <summary>

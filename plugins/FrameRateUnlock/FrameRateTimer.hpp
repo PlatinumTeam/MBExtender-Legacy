@@ -15,15 +15,16 @@ public:
 	virtual ~FrameRateTimer() { }
 	
 	/// <summary>
-	/// Gets the amount of time elapsed since the last time <see cref="update"/> was called, in milliseconds.
+	/// Gets the amount of time elapsed since the last frame, in milliseconds.
 	/// </summary>
-	/// <returns>The amount of time elapsed since the last time <see cref="update"/> was called, in milliseconds.</returns>
+	/// <returns>The amount of time elapsed since the last frame, in milliseconds.</returns>
 	virtual uint32_t getElapsedTimeMs() = 0;
 	
 	/// <summary>
-	/// Updates the timer such that subsequent calls to <see cref="getElapsedTimeMs"/> will return the amount of time elapsed since the most recent update.
+	/// Updates the timer after a frame update.
 	/// </summary>
-	virtual void update() = 0;
+	/// <param name="elapsed">The amount of time elapsed since the last frame, in milliseconds.</param>
+	virtual void update(uint32_t elapsed) = 0;
 };
 
 #endif

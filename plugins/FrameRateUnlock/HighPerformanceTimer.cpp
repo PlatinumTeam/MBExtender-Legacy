@@ -5,7 +5,10 @@ HighPerformanceTimer::HighPerformanceTimer()
 	: frequency(0), lastTime(0)
 {
 	calculateFrequency();
-	update();
+	
+	LARGE_INTEGER currentTime;
+	if (frequency != 0 && QueryPerformanceCounter(&currentTime))
+		lastTime = currentTime.QuadPart;
 }
 
 uint32_t HighPerformanceTimer::getElapsedTimeMs()
@@ -18,11 +21,10 @@ uint32_t HighPerformanceTimer::getElapsedTimeMs()
 	return static_cast<uint32_t>(msec);
 }
 
-void HighPerformanceTimer::update()
+void HighPerformanceTimer::update(uint32_t elapsed)
 {
-	LARGE_INTEGER currentTime;
-	if (frequency != 0 && QueryPerformanceCounter(&currentTime))
-		lastTime = currentTime.QuadPart;
+	if (frequency != 0)
+		lastTime += elapsed * frequency / 1000;
 }
 
 bool HighPerformanceTimer::isSupported()

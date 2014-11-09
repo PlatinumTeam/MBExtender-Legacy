@@ -5,7 +5,7 @@ MultimediaTimer::MultimediaTimer()
 	: lastTime(0), resolution(1)
 {
 	applyFinestResolution();
-	update();
+	lastTime = timeGetTime();
 }
 
 MultimediaTimer::~MultimediaTimer()
@@ -19,9 +19,9 @@ uint32_t MultimediaTimer::getElapsedTimeMs()
 	return currentTime - lastTime;
 }
 
-void MultimediaTimer::update()
+void MultimediaTimer::update(uint32_t elapsed)
 {
-	lastTime = timeGetTime();
+	lastTime += elapsed;
 }
 
 void MultimediaTimer::applyFinestResolution()
