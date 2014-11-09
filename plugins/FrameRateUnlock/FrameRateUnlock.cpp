@@ -34,6 +34,8 @@ namespace
 	std::unique_ptr<FrameRateTimer> timer;       // Active frame rate timer
 	const uint32_t MinUpdateInterval = 1;        // Minimum value that updateInterval can have.
 	uint32_t updateInterval = MinUpdateInterval; // Update interval in milliseconds
+	double timeScale = 1.0;                      // Time multiplier
+	double accumulator = 0;                      // Time accumulator (used for time scaling - if this becomes >= 1, then an update can happen)
 	bool enabled = true;                         // If set to false, fall back to old timing system
 		
 	/// <summary>
@@ -75,10 +77,16 @@ TorqueOverride(void, TimeManager::process, (), originalProcess)
 	{
 		timer->update(elapsed);
 
-		// Post a time update event
-		TGE::TimeEvent ev;
-		ev.deltaTime = elapsed;
-		TGE::Game->postEvent(ev);
+		// Add time to the accumulator
+		accumulator += timeScale * elapsed;
+		if (accumulator >= 1.0)
+		{
+			// At least 1ms accumulated - post a time update event
+			TGE::TimeEvent ev;
+			ev.deltaTime = static_cast<U32>(accumulator);
+			TGE::Game->postEvent(ev);
+			accumulator -= ev.deltaTime;
+		}
 	}
 }
 
@@ -98,6 +106,17 @@ ConsoleFunction(setTickInterval, void, 2, 2, "setTickInterval(msec)")
 {
 	int newInterval = atoi(argv[1]);
 	updateInterval = max(MinUpdateInterval, newInterval);
+}
+
+// Console function to set the time scale
+ConsoleFunction(setTimeScale, void, 2, 2, "setTimeScale(scale)")
+{
+	double newScale = atof(argv[1]);
+	if (newScale > 0)
+	{
+		timeScale = newScale;
+		TGE::Con::printf("Set time scale to %f", timeScale);
+	}
 }
 
 PLUGINCALLBACK void preEngineInit(PluginInterface *plugin)
