@@ -49,6 +49,7 @@ Sample Plugins
 + *ExternalConsole* - Creates an external console window for the game
 + *RandomPowerupsDemo* - Causes powerups built into the game engine to have random effects when used
 + *TestPlugin* - Demonstration of how to create a simple plugin
++ *FrameRateUnlock* - (Windows only) Unlocks the game's frame rate
 + *MultiplayerFix* - (Linux only) Fixes cross-platform multiplayer
 + *FakeIgnition* - (Linux only) Disables the game's ignition system
 
