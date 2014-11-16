@@ -29,13 +29,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FrameRateTimer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MultimediaTimer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HighPerformanceTimer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

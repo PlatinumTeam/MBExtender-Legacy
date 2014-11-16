@@ -1,36 +1,30 @@
 #ifndef HIGHPERFORMANCETIMER_HPP
 #define HIGHPERFORMANCETIMER_HPP
 
-#include "FrameRateTimer.hpp"
+#include "GameTimer.hpp"
 
 /// <summary>
 /// A frame rate timer that uses the system's high performance counter.
 /// </summary>
-class HighPerformanceTimer: public FrameRateTimer
+class HighPerformanceTimer: public GameTimer
 {
 public:
 	/// <summary>
 	/// Initializes a new instance of the <see cref="HighPerformanceTimer"/> class.
 	/// </summary>
 	HighPerformanceTimer();
-	
-	/// <summary>
-	/// Gets the frequency of the timer in ticks per second.
-	/// </summary>
-	/// <returns>The frequency of the timer in ticks per second, or 0 if the timer is not supported by the user's system.</returns>
-	uint64_t getFrequency() const { return frequency; }
 
 	/// <summary>
-	/// Gets the amount of time elapsed since the last frame, in milliseconds.
+	/// Gets the current value of the timer, in ticks.
 	/// </summary>
-	/// <returns>The amount of time elapsed since the last frame, in milliseconds.</returns>
-	uint32_t getElapsedTimeMs();
+	/// <returns>The current value of the timer, in ticks.</returns>
+	uint64_t getTime();
 
 	/// <summary>
-	/// Updates the timer after a frame update.
+	/// Gets the number of ticks in one second.
 	/// </summary>
-	/// <param name="elapsed">The amount of time elapsed since the last frame, in milliseconds.</param>
-	void update(uint32_t elapsed);
+	/// <returns>The number of ticks in one second.</returns>
+	uint64_t getTicksPerSecond() { return frequency; }
 	
 	/// <summary>
 	/// Determines whether the high performance timer is supported by the user's system.
@@ -45,7 +39,6 @@ private:
 	void calculateFrequency();
 
 	uint64_t frequency; // Frequency in ticks per second
-	uint64_t lastTime;  // Value of timer at last call to getElapsedTimeMs in ticks
 };
 
 #endif

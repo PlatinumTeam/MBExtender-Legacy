@@ -2,10 +2,9 @@
 #include "MultimediaTimer.hpp"
 
 MultimediaTimer::MultimediaTimer()
-	: lastTime(0), resolution(1)
+	: resolution(1)
 {
 	applyFinestResolution();
-	lastTime = timeGetTime();
 }
 
 MultimediaTimer::~MultimediaTimer()
@@ -13,15 +12,9 @@ MultimediaTimer::~MultimediaTimer()
 	restoreResolution();
 }
 
-uint32_t MultimediaTimer::getElapsedTimeMs()
+uint64_t MultimediaTimer::getTime()
 {
-	uint32_t currentTime = timeGetTime();
-	return currentTime - lastTime;
-}
-
-void MultimediaTimer::update(uint32_t elapsed)
-{
-	lastTime += elapsed;
+	return timeGetTime();
 }
 
 void MultimediaTimer::applyFinestResolution()

@@ -1,12 +1,12 @@
 #ifndef MULTIMEDIATIMER_HPP
 #define MULTIMEDIATIMER_HPP
 
-#include "FrameRateTimer.hpp"
+#include "GameTimer.hpp"
 
 /// <summary>
 /// A frame rate timer that uses the system's multimedia timer.
 /// </summary>
-class MultimediaTimer: public FrameRateTimer
+class MultimediaTimer: public GameTimer
 {
 public:	
 	/// <summary>
@@ -22,22 +22,16 @@ public:
 	~MultimediaTimer();
 	
 	/// <summary>
-	/// Gets the resolution of the timer, in milliseconds.
+	/// Gets the current value of the timer, in ticks.
 	/// </summary>
-	/// <returns>The resolution of the timer, in milliseconds.</returns>
-	int getResolution() const { return resolution; }
-		
-	/// <summary>
-	/// Gets the amount of time elapsed since the last frame, in milliseconds.
-	/// </summary>
-	/// <returns>The amount of time elapsed since the last frame, in milliseconds.</returns>
-	uint32_t getElapsedTimeMs();
+	/// <returns>The current value of the timer, in ticks.</returns>
+	virtual uint64_t getTime();
 
 	/// <summary>
-	/// Updates the timer after a frame update.
+	/// Gets the number of ticks in one second.
 	/// </summary>
-	/// <param name="elapsed">The amount of time elapsed since the last frame, in milliseconds.</param>
-	void update(uint32_t elapsed);
+	/// <returns>The number of ticks in one second.</returns>
+	virtual uint64_t getTicksPerSecond() { return resolution * 1000; }
 
 private:	
 	/// <summary>
@@ -50,8 +44,8 @@ private:
 	/// </summary>
 	void restoreResolution();
 
-	int resolution;    // Resolution in milliseconds
-	uint32_t lastTime; // Time of last call to getElapsedTimeMs
+	// Resolution in milliseconds
+	int resolution;
 };
 
 #endif

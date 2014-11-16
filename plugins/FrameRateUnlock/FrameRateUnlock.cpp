@@ -25,15 +25,16 @@
 #include <PluginLoader/PluginInterface.h>
 #include <Windows.h>
 #include <memory>
-#include "FrameRateTimer.hpp"
+#include "GameTimer.hpp"
 #include "HighPerformanceTimer.hpp"
 #include "MultimediaTimer.hpp"
 
 namespace
 {
-	std::unique_ptr<FrameRateTimer> timer;       // Active frame rate timer
+	std::unique_ptr<GameTimer> timer;       // Active frame rate timer
 	const uint32_t MinUpdateInterval = 1;        // Minimum value that updateInterval can have.
 	uint32_t updateInterval = MinUpdateInterval; // Update interval in milliseconds
+	uint64_t lastTime;                           // Last frame time
 	double timeScale = 1.0;                      // Time multiplier
 	double accumulator = 0;                      // Time accumulator (used for time scaling - if this becomes >= 1, then an update can happen)
 	bool enabled = true;                         // If set to false, fall back to old timing system
@@ -48,17 +49,19 @@ namespace
 		if (HighPerformanceTimer::isSupported())
 		{
 			HighPerformanceTimer *hpt = new HighPerformanceTimer();
-			timer = std::unique_ptr<FrameRateTimer>(hpt);
-			TGE::Con::printf("FrameRateUnlock: Using high-performance timer with frequency = %d", static_cast<int>(hpt->getFrequency()));
+			timer = std::unique_ptr<GameTimer>(hpt);
+			TGE::Con::printf("FrameRateUnlock: Using high-performance timer");
 		}
 		else
 #endif
 		{
 			// Fall back to multimedia timer
 			MultimediaTimer *mm = new MultimediaTimer();
-			timer = std::unique_ptr<FrameRateTimer>(mm);
-			TGE::Con::printf("FrameRateUnlock: Using multimedia timer with resolution = %d", mm->getResolution());
+			timer = std::unique_ptr<GameTimer>(mm);
+			TGE::Con::printf("FrameRateUnlock: Using multimedia timer");
 		}
+		TGE::Con::printf("FrameRateUnlock: Timer resolution = %d", static_cast<int>(timer->getTicksPerSecond()));
+		lastTime = timer->getTime();
 	}
 }
 
@@ -72,13 +75,14 @@ TorqueOverride(void, TimeManager::process, (), originalProcess)
 	}
 
 	// Only update if at least updateInterval milliseconds have passed
-	uint32_t elapsed = timer->getElapsedTimeMs();
-	if (elapsed >= updateInterval)
+	uint64_t elapsedMs = (timer->getTime() - lastTime) * 1000 / timer->getTicksPerSecond();
+	if (elapsedMs >= updateInterval)
 	{
-		timer->update(elapsed);
+		// Add a whole number of milliseconds onto the reference time
+		lastTime += elapsedMs * timer->getTicksPerSecond() / 1000;
 
 		// Add time to the accumulator
-		accumulator += timeScale * elapsed;
+		accumulator += timeScale * elapsedMs;
 		if (accumulator >= 1.0)
 		{
 			// At least 1ms accumulated - post a time update event

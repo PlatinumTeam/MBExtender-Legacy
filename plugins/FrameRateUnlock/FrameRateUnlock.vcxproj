@@ -89,7 +89,7 @@
     <ClCompile Include="MultimediaTimer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FrameRateTimer.hpp" />
+    <ClInclude Include="GameTimer.hpp" />
     <ClInclude Include="HighPerformanceTimer.hpp" />
     <ClInclude Include="MultimediaTimer.hpp" />
   </ItemGroup>
