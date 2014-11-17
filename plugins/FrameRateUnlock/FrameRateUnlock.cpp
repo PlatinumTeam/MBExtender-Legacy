@@ -31,7 +31,7 @@
 
 namespace
 {
-	std::unique_ptr<GameTimer> timer;       // Active frame rate timer
+	std::unique_ptr<GameTimer> timer;            // Active frame rate timer
 	const uint32_t MinUpdateInterval = 1;        // Minimum value that updateInterval can have.
 	uint32_t updateInterval = MinUpdateInterval; // Update interval in milliseconds
 	uint64_t lastTime;                           // Last frame time

@@ -38,6 +38,8 @@ namespace TGE
 	class GameConnection;
 	class Camera;
 	class ResourceObject;
+	class NetConnection;
+	class BitStream;
 	struct Move;
 }
 
@@ -59,7 +61,7 @@ namespace TGE
 		VTABLE(TGEOFF_CONSOLEOBJECT_VTABLE);
 		
 		UNDEFVIRT(getClassRep);
-		VIRTDTOR(~ConsoleObject, 1);
+		VIRTDTOR(~ConsoleObject, TGEVIRT_CONSOLEOBJECT_DESTRUCTOR);
 		// NOTE: On the Mac version, there's another virtual function right here - seems to be another (?) virtual destructor
 	};
 
@@ -94,8 +96,8 @@ namespace TGE
 	{
 	public:
 		UNDEFVIRT(getUpdatePriority);
-		UNDEFVIRT(packUpdate);
-		UNDEFVIRT(unpackUpdate);
+		VIRTFN(void, packUpdate, (NetConnection *conn, U32 mask, BitStream *stream), (conn, mask, stream), TGEVIRT_NETOBJECT_PACKUPDATE);
+		VIRTFN(void, unpackUpdate, (NetConnection *conn, BitStream *stream), (conn, stream), TGEVIRT_NETOBJECT_UNPACKUPDATE);
 		UNDEFVIRT(onCameraScopeQuery);
 	};
 
@@ -249,6 +251,14 @@ namespace TGE
 	{
 	};
 
+	class InteriorInstance : public SceneObject
+	{
+	};
+
+	class TSStatic : public SceneObject
+	{
+	};
+
 	struct Collision
 	{
 		SceneObject* object;
@@ -377,6 +387,13 @@ namespace TGE
 		MEMBERFNSIMP(FileStatus, getStatus, TGEADDR_FILE_GETSTATUS);
 		MEMBERFN(FileStatus, read, (U32 size, char *dst, U32 *bytesRead), (size, dst, bytesRead), TGEADDR_FILE_READ);
 		MEMBERFN(FileStatus, write, (U32 size, const char *src, U32 *bytesWritten), (size, src, bytesWritten), TGEADDR_FILE_WRITE);
+	};
+
+	class BitStream : public Stream
+	{
+	public:
+		MEMBERFN(void, writeInt, (S32 value, S32 bitCount), (value, bitCount), TGEADDR_BITSTREAM_WRITEINT);
+		MEMBERFN(S32, readInt, (S32 bitCount), (bitCount), TGEADDR_BITSTREAM_READINT);
 	};
 
 	class ResManager
@@ -559,18 +576,6 @@ namespace TGE
 		FN(void, init, (), TGEADDR_PARTICLEENGINE_INIT);
 	}
 
-	/*namespace ShapeBase
-	{
-		// Shadows (thiscall - do not call directly)
-		THISFN(void, renderShadow, (float, float), 0x406FF0);
-	}
-
-	namespace TSStatic
-	{
-		// Shadows (thiscall - do not call directly)
-		THISFN(void, renderShadow, (float, float), 0x40524F);
-	}*/
-
 	namespace Sim
 	{
 		FN(SimObject*, findObject, (const char *name), TGEADDR_SIM_FINDOBJECT);
@@ -610,6 +615,24 @@ namespace TGE
 			RAWMEMBERFN(TGE::Marble, void, advancePhysics, (const Move *move, U32 delta), TGEADDR_MARBLE_ADVANCEPHYSICS);
 		}
 
+		namespace GameBase
+		{
+			RAWMEMBERFN(TGE::GameBase, void, packUpdate, (TGE::NetConnection *conn, U32 mask, TGE::BitStream *stream), TGEADDR_GAMEBASE_PACKUPDATE);
+			RAWMEMBERFN(TGE::GameBase, void, unpackUpdate, (TGE::NetConnection *conn, TGE::BitStream *stream), TGEADDR_GAMEBASE_UNPACKUPDATE);
+		}
+
+		namespace TSStatic
+		{
+			RAWMEMBERFN(TGE::TSStatic, void, packUpdate, (TGE::NetConnection *conn, U32 mask, TGE::BitStream *stream), TGEADDR_TSSTATIC_PACKUPDATE);
+			RAWMEMBERFN(TGE::TSStatic, void, unpackUpdate, (TGE::NetConnection *conn, TGE::BitStream *stream), TGEADDR_TSSTATIC_UNPACKUPDATE);
+		}
+
+		namespace InteriorInstance
+		{
+			RAWMEMBERFN(TGE::InteriorInstance, void, packUpdate, (TGE::NetConnection *conn, U32 mask, TGE::BitStream *stream), TGEADDR_INTERIORINSTANCE_PACKUPDATE);
+			RAWMEMBERFN(TGE::InteriorInstance, void, unpackUpdate, (TGE::NetConnection *conn, TGE::BitStream *stream), TGEADDR_INTERIORINSTANCE_UNPACKUPDATE);
+		}
+
 		namespace FileStream
 		{
 			RAWMEMBERFN(TGE::FileStream, bool, open, (const char *path, int accessMode), TGEADDR_FILESTREAM_OPEN);
@@ -639,6 +662,12 @@ namespace TGE
 			RAWMEMBERFN(TGE::File, TGE::File::FileStatus, read, (U32 size, char *dst, U32 *bytesRead), TGEADDR_FILE_READ);
 			RAWMEMBERFN(TGE::File, TGE::File::FileStatus, write, (U32 size, const char *src, U32 *bytesWritten), TGEADDR_FILE_WRITE);
 			RAWMEMBERFNSIMP(TGE::File, void, destructor_, TGEADDR_FILE_DTOR);
+		}
+		
+		namespace BitStream
+		{
+			RAWMEMBERFN(TGE::BitStream, void, writeInt, (S32 value, S32 bitCount), TGEADDR_BITSTREAM_WRITEINT);
+			RAWMEMBERFN(TGE::BitStream, S32, readInt, (S32 bitCount), TGEADDR_BITSTREAM_READINT);
 		}
 		
 		namespace Camera
