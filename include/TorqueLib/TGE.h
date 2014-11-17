@@ -96,7 +96,7 @@ namespace TGE
 	{
 	public:
 		UNDEFVIRT(getUpdatePriority);
-		VIRTFN(void, packUpdate, (NetConnection *conn, U32 mask, BitStream *stream), (conn, mask, stream), TGEVIRT_NETOBJECT_PACKUPDATE);
+		VIRTFN(U32, packUpdate, (NetConnection *conn, U32 mask, BitStream *stream), (conn, mask, stream), TGEVIRT_NETOBJECT_PACKUPDATE);
 		VIRTFN(void, unpackUpdate, (NetConnection *conn, BitStream *stream), (conn, stream), TGEVIRT_NETOBJECT_UNPACKUPDATE);
 		UNDEFVIRT(onCameraScopeQuery);
 	};
@@ -617,19 +617,19 @@ namespace TGE
 
 		namespace GameBase
 		{
-			RAWMEMBERFN(TGE::GameBase, void, packUpdate, (TGE::NetConnection *conn, U32 mask, TGE::BitStream *stream), TGEADDR_GAMEBASE_PACKUPDATE);
+			RAWMEMBERFN(TGE::GameBase, U32, packUpdate, (TGE::NetConnection *conn, U32 mask, TGE::BitStream *stream), TGEADDR_GAMEBASE_PACKUPDATE);
 			RAWMEMBERFN(TGE::GameBase, void, unpackUpdate, (TGE::NetConnection *conn, TGE::BitStream *stream), TGEADDR_GAMEBASE_UNPACKUPDATE);
 		}
 
 		namespace TSStatic
 		{
-			RAWMEMBERFN(TGE::TSStatic, void, packUpdate, (TGE::NetConnection *conn, U32 mask, TGE::BitStream *stream), TGEADDR_TSSTATIC_PACKUPDATE);
+			RAWMEMBERFN(TGE::TSStatic, U32, packUpdate, (TGE::NetConnection *conn, U32 mask, TGE::BitStream *stream), TGEADDR_TSSTATIC_PACKUPDATE);
 			RAWMEMBERFN(TGE::TSStatic, void, unpackUpdate, (TGE::NetConnection *conn, TGE::BitStream *stream), TGEADDR_TSSTATIC_UNPACKUPDATE);
 		}
 
 		namespace InteriorInstance
 		{
-			RAWMEMBERFN(TGE::InteriorInstance, void, packUpdate, (TGE::NetConnection *conn, U32 mask, TGE::BitStream *stream), TGEADDR_INTERIORINSTANCE_PACKUPDATE);
+			RAWMEMBERFN(TGE::InteriorInstance, U32, packUpdate, (TGE::NetConnection *conn, U32 mask, TGE::BitStream *stream), TGEADDR_INTERIORINSTANCE_PACKUPDATE);
 			RAWMEMBERFN(TGE::InteriorInstance, void, unpackUpdate, (TGE::NetConnection *conn, TGE::BitStream *stream), TGEADDR_INTERIORINSTANCE_UNPACKUPDATE);
 		}
 
