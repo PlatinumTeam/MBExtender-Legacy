@@ -31,7 +31,7 @@ Open CMake, click "Browse Source," and select your MBExtender source folder. Als
 
 See the Linux section below for information on building from Unix Makefiles.
 
-* Note: if you choose to create an Xcode project, ensure that the build target is set to 32-bit. Otherwise, build errors may occur or an incorrect binary will be built.*
+**Note: if you choose to create an Xcode project, ensure that the build target is set to 32-bit. Otherwise, build errors may occur or an incorrect binary will be built.**
 
 By default, MBExtender will be installed to an "install" subfolder of your build directory.
 
