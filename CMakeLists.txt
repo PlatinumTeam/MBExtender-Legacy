@@ -33,11 +33,6 @@ if (NOT HAVE_CPUID_H AND NOT HAVE_INTRIN_H)
 	message (FATAL_ERROR "Either cpuid.h or intrin.h is required.")
 endif ()
 
-# Search for Boost components
-set (Boost_USE_STATIC_LIBS ON CACHE BOOL "Whether or not PluginLoader should statically link against Boost.")
-find_package (Boost REQUIRED COMPONENTS system filesystem)
-include_directories (${Boost_INCLUDE_DIRS})
-
 # Generate a config.h file
 configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 add_definitions(-DHAVE_CONFIG_H)
@@ -71,6 +66,7 @@ set (PLUGINLOADER_SRC
 	src/PluginLoader/FuncInterceptor.cpp
 	src/PluginLoader/PluginLoader.cpp
 	src/PluginLoader/TrampolineGenerator.cpp
+	src/PluginLoader/Filesystem-common.cpp
 )
 if (UNIX)
 	set (PLUGINLOADER_SRC ${PLUGINLOADER_SRC}
@@ -78,6 +74,7 @@ if (UNIX)
 		src/PluginLoader/unix/main-unix.cpp
 		src/PluginLoader/unix/Memory-unix.cpp
 		src/PluginLoader/unix/SharedObject-unix.cpp
+		src/PluginLoader/unix/Filesystem-unix.cpp
 	)
 elseif (WIN32)
 	set (PLUGINLOADER_SRC ${PLUGINLOADER_SRC}
@@ -85,10 +82,10 @@ elseif (WIN32)
 		src/PluginLoader/win32/main-win32.cpp
 		src/PluginLoader/win32/Memory-win32.cpp
 		src/PluginLoader/win32/SharedObject-win32.cpp
+		src/PluginLoader/win32/Filesystem-win32.cpp
 	)
 endif ()
 add_library (PluginLoader SHARED ${PLUGINLOADER_SRC})
-target_link_libraries (PluginLoader ${Boost_LIBRARIES})
 if (MSVC)
 	set_property (TARGET PluginLoader APPEND PROPERTY LINK_FLAGS "/DEF:\"${PROJECT_SOURCE_DIR}/src/PluginLoader/win32/PluginLoader.def\"")
 endif ()

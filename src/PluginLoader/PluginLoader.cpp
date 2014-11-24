@@ -3,25 +3,21 @@
 
 #include <vector>
 #include <string>
-#include <boost/filesystem.hpp>
 #include "FuncInterceptor.h"
 #include "BasicPluginInterface.h"
 #include "SharedObject.h"
+#include "Filesystem.h"
 #include <TorqueLib/TGE.h>
 
-#if defined(__APPLE__)
-// The Mac executable changes the working directory to the root of the app folder
-#define PATH_PREFIX "./Contents/MacOS/"
-#else
-#define PATH_PREFIX "./"
-#endif
-
 #if defined(_WIN32)
-const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.dll";
+ #define PATH_PREFIX
+ const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.dll";
 #elif defined(__APPLE__)
-const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.dylib";
+ #define PATH_PREFIX "./Contents/MacOS/"
+ const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.dylib";
 #elif defined(__linux)
-const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.so";
+ #define PATH_PREFIX "./"
+ const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.so";
 #endif
 
 typedef void(*initMath_t)();
@@ -38,7 +34,7 @@ namespace
 	
 	struct LoadedPlugin
 	{
-		boost::filesystem::path path;
+		std::string path;
 		SharedObject *library;
 		BasicPluginInterface *pluginInterface;
 	};
@@ -46,32 +42,34 @@ namespace
 
 	void loadPlugins()
 	{
-		boost::filesystem::path pluginDir(PATH_PREFIX "plugins");
-		if (!boost::filesystem::exists(pluginDir) || !boost::filesystem::is_directory(pluginDir))
+		std::string pluginDir = PATH_PREFIX "plugins";
+		if (!Filesystem::Directory::exists(pluginDir))
 		{
-			TGE::Con::warnf("   No \"plugins\" directory found!");
+			TGE::Con::warnf("   No %s directory found!", pluginDir.c_str());
 			return;
 		}
-		
-		std::vector<boost::filesystem::path> paths;
-		std::copy(boost::filesystem::directory_iterator(pluginDir), boost::filesystem::directory_iterator(), std::back_inserter(paths));
+		std::vector<std::string> paths;
+		if (!Filesystem::Directory::enumerate(pluginDir, &paths))
+		{
+			TGE::Con::warnf("   Unable to enumerate the %s directory!", pluginDir.c_str());
+			return;
+		}
 		for (auto &path : paths)
 		{
-			if (path.extension() != SharedObject::DefaultExtension)
+			if (Filesystem::Path::getExtension(path) != SharedObject::DefaultExtension)
 				continue;
 			
-			std::string pathStr = path.generic_string();
-			TGE::Con::printf("   Loading %s", pathStr.c_str());
-			SharedObject *library = new SharedObject(pathStr.c_str());
+			TGE::Con::printf("   Loading %s", path.c_str());
+			SharedObject *library = new SharedObject(path.c_str());
 			if (library->loaded())
 			{
-				LoadedPlugin info = { path, library, new BasicPluginInterface(basicInterceptor, pathStr) };
+				LoadedPlugin info = { path, library, new BasicPluginInterface(basicInterceptor, path) };
 				loadedPlugins->push_back(info);
 			}
 			else
 			{
 				delete library;
-				TGE::Con::errorf("   Unable to load %s!", pathStr.c_str());
+				TGE::Con::errorf("   Unable to load %s!", path.c_str());
 			}
 		}
 	}
@@ -83,15 +81,14 @@ namespace
 		TGE::Con::printf("%s", message);
 		for (auto &plugin : *loadedPlugins)
 		{
-			std::string pathStr = plugin.path.generic_string();
-			TGE::Con::printf("   Initializing %s", pathStr.c_str());
+			TGE::Con::printf("   Initializing %s", plugin.path.c_str());
 
 			// If it exports an initialization function, call it
 			auto initFunc = reinterpret_cast<initPlugin_t>(plugin.library->getSymbol(fnName));
 			if (initFunc)
 				initFunc(plugin.pluginInterface);
 			else
-				TGE::Con::warnf("   WARNING: %s does not have a %s() function!", pathStr.c_str(), fnName);
+				TGE::Con::warnf("   WARNING: %s does not have a %s() function!", plugin.path.c_str(), fnName);
 		}
 		TGE::Con::printf("");
 	}
@@ -111,7 +108,7 @@ namespace
 		for (auto &plugin : *loadedPlugins)
 		{
 			// Set the Plugin::Loaded variable corresponding to the plugin
-			std::string varName = plugin.path.stem().generic_string();
+			std::string varName = Filesystem::Path::getFilenameWithoutExtension(plugin.path);
 			varName = "Plugin::Loaded" + varName;
 			TGE::Con::setBoolVariable(varName.c_str(), true);
 		}
