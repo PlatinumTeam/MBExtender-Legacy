@@ -42,7 +42,7 @@ CMake can also be used from a terminal:
 ```
 $ mkdir build
 $ cd build
-$ cmake -G "Unix Makefiles" ...
+$ cmake -G "Unix Makefiles" ..
 ```
 
 Finally, to build and install MBExtender, run the following commands from inside the build directory:
