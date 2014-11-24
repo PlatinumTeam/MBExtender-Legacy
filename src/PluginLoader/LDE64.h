@@ -23,7 +23,11 @@ namespace LDE
 	/// </summary>
 	/// <param name="address">The address of the instruction to decode.</param>
 	/// <param name="size">The address size to decode the instruction with.</param>
+#ifndef __GNUC__
 	extern "C" int __stdcall LDE(void *address, LDEAddrSize size);
+#else
+	int __stdcall LDE(void *address, LDEAddrSize size) asm("_LDE");
+#endif
 }
 
 #endif

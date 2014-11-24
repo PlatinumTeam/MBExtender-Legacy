@@ -16,7 +16,7 @@ namespace Memory
 	{
 		long pageSize = sysconf(_SC_PAGESIZE);
 		size_t size = (minSize + pageSize - 1) & ~(pageSize - 1); // Round minSize up to a multiple of pageSize
-		void *buffer = mmap(nullptr, size, PROT_EXEC | PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+		void *buffer = mmap(nullptr, size, PROT_EXEC | PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 		if (buffer != MAP_FAILED)
 		{
 			*actualSize = size;
@@ -58,7 +58,7 @@ namespace Memory
 			size_t addr = reinterpret_cast<size_t>(ptr);
 			long pageSize = sysconf(_SC_PAGESIZE);
 			size_t alignedAddr = addr & ~(pageSize - 1);
-			*resultSize = size + addr - alignedAddr;
+			*resultSize = (size + addr - alignedAddr + pageSize - 1) & ~(pageSize - 1);
 			*resultPtr = reinterpret_cast<void*>(alignedAddr);
 		}
 	}

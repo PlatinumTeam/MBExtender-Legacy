@@ -121,18 +121,22 @@ inline F32 mLinearTween(F32 t, F32 b, F32 c, F32 d) {
 // t: current time, b: beginning value, c: change in value, d: duration
 // t and d can be in frames or seconds/milliseconds
 inline F32 mEaseInQuad(F32 t, F32 b, F32 c, F32 d) {
-	return c*(t/=d)*t + b;
+	t/=d;
+	return c*t*t + b;
 };
 
 // quadratic easing out - decelerating to zero velocity
 inline F32 mEaseOutQuad(F32 t, F32 b, F32 c, F32 d) {
-	return -c *(t/=d)*(t-2) + b;
+	t/=d;
+	return -c *t*(t-2) + b;
 };
 
 // quadratic easing in/out - acceleration until halfway, then deceleration
 inline F32 mEaseInOutQuad(F32 t, F32 b, F32 c, F32 d) {
-	if ((t/=d/2) < 1) return c/2*t*t + b;
-	return -c/2 * ((--t)*(t-2) - 1) + b;
+	t/=d/2;
+	if (t < 1) return c/2*t*t + b;
+	--t;
+	return -c/2 * (t*(t-2) - 1) + b;
 };
 
  ///////////// CUBIC EASING: t^3 ///////////////////////
@@ -141,18 +145,22 @@ inline F32 mEaseInOutQuad(F32 t, F32 b, F32 c, F32 d) {
 // t: current time, b: beginning value, c: change in value, d: duration
 // t and d can be frames or seconds/milliseconds
 inline F32 mEaseInCubic(F32 t, F32 b, F32 c, F32 d) {
-	return c*(t/=d)*t*t + b;
+	t/=d;
+	return c*t*t*t + b;
 };
 
 // cubic easing out - decelerating to zero velocity
 inline F32 mEaseOutCubic(F32 t, F32 b, F32 c, F32 d) {
-	return c*((t=t/d-1)*t*t + 1) + b;
+	t=t/d-1;
+	return c*(t*t*t + 1) + b;
 };
 
 // cubic easing in/out - acceleration until halfway, then deceleration
 inline F32 mEaseInOutCubic(F32 t, F32 b, F32 c, F32 d) {
-	if ((t/=d/2) < 1) return c/2*t*t*t + b;
-	return c/2*((t-=2)*t*t + 2) + b;
+	t/=d/2;
+	if (t < 1) return c/2*t*t*t + b;
+	t-=2;
+	return c/2*(t*t*t + 2) + b;
 };
 
 
@@ -162,18 +170,22 @@ inline F32 mEaseInOutCubic(F32 t, F32 b, F32 c, F32 d) {
 // t: current time, b: beginning value, c: change in value, d: duration
 // t and d can be frames or seconds/milliseconds
 inline F32 mEaseInQuart(F32 t, F32 b, F32 c, F32 d) {
-	return c*(t/=d)*t*t*t + b;
+	t/=d;
+	return c*t*t*t*t + b;
 };
 
 // quartic easing out - decelerating to zero velocity
 inline F32 mEaseOutQuart(F32 t, F32 b, F32 c, F32 d) {
-	return -c * ((t=t/d-1)*t*t*t - 1) + b;
+	t=t/d-1;
+	return -c * (t*t*t*t - 1) + b;
 };
 
 // quartic easing in/out - acceleration until halfway, then deceleration
 inline F32 mEaseInOutQuart(F32 t, F32 b, F32 c, F32 d) {
-	if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
-	return -c/2 * ((t-=2)*t*t*t - 2) + b;
+	t/=d/2;
+	if (t < 1) return c/2*t*t*t*t + b;
+	t-=2;
+	return -c/2 * (t*t*t*t - 2) + b;
 };
 
 
@@ -183,18 +195,22 @@ inline F32 mEaseInOutQuart(F32 t, F32 b, F32 c, F32 d) {
 // t: current time, b: beginning value, c: change in value, d: duration
 // t and d can be frames or seconds/milliseconds
 inline F32 mEaseInQuint(F32 t, F32 b, F32 c, F32 d) {
-	return c*(t/=d)*t*t*t*t + b;
+	t/=d;
+	return c*t*t*t*t*t + b;
 };
 
 // quintic easing out - decelerating to zero velocity
 inline F32 mEaseOutQuint(F32 t, F32 b, F32 c, F32 d) {
-	return c*((t=t/d-1)*t*t*t*t + 1) + b;
+	t=t/d-1;
+	return c*(t*t*t*t*t + 1) + b;
 };
 
 // quintic easing in/out - acceleration until halfway, then deceleration
 inline F32 mEaseInOutQuint(F32 t, F32 b, F32 c, F32 d) {
-	if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
-	return c/2*((t-=2)*t*t*t*t + 2) + b;
+	t/=d/2;
+	if (t < 1) return c/2*t*t*t*t*t + b;
+	t-=2;
+	return c/2*(t*t*t*t*t + 2) + b;
 };
 
 
@@ -235,7 +251,8 @@ inline F32 mEaseOutExpo(F32 t, F32 b, F32 c, F32 d) {
 inline F32 mEaseInOutExpo(F32 t, F32 b, F32 c, F32 d) {
 	if (t==0) return b;
 	if (t==d) return b+c;
-	if ((t/=d/2) < 1) return c/2 * mPow(2, 10 * (t - 1)) + b;
+	t/=d/2;
+	if (t < 1) return c/2 * mPow(2, 10 * (t - 1)) + b;
 	return c/2 * (-mPow(2, -10 * --t) + 2) + b;
 };
 
@@ -245,18 +262,22 @@ inline F32 mEaseInOutExpo(F32 t, F32 b, F32 c, F32 d) {
 // circular easing in - accelerating from zero velocity
 // t: current time, b: beginning value, c: change in position, d: duration
 inline F32 mEaseInCirc (F32 t, F32 b, F32 c, F32 d) {
-	return -c * (mSqrt(1 - (t/=d)*t) - 1) + b;
+	t/=d;
+	return -c * (mSqrt(1 - t*t) - 1) + b;
 };
 
 // circular easing out - decelerating to zero velocity
 inline F32 mEaseOutCirc (F32 t, F32 b, F32 c, F32 d) {
-	return c * mSqrt(1 - (t=t/d-1)*t) + b;
+	t=t/d-1;
+	return c * mSqrt(1 - t*t) + b;
 };
 
 // circular easing in/out - acceleration until halfway, then deceleration
 inline F32 mEaseInOutCirc(F32 t, F32 b, F32 c, F32 d) {
-	if ((t/=d/2) < 1) return -c/2 * (mSqrt(1 - t*t) - 1) + b;
-	return c/2 * (mSqrt(1 - (t-=2)*t) + 1) + b;
+	t/=d/2;
+	if (t < 1) return -c/2 * (mSqrt(1 - t*t) - 1) + b;
+	t-=2;
+	return c/2 * (mSqrt(1 - t*t) + 1) + b;
 };
 
 
@@ -266,15 +287,16 @@ inline F32 mEaseInOutCirc(F32 t, F32 b, F32 c, F32 d) {
 // t and d can be in frames or seconds/milliseconds
 
 inline F32 mEaseInElastic(F32 t, F32 b, F32 c, F32 d, F32 a, F32 p) {
-	if (t==0) return b;  if ((t/=d)==1) return b+c;  if (p<=0) p=d*.3f;
+	if (t==0) return b;  t/=d;  if (t==1) return b+c;  if (p<=0) p=d*.3f;
 	F32 s;
 	if (a < mFabs(c)) { a=c; s=p/4; }
 	else s = p/(2*M_PI_F) * mAsin (c/a);
-	return -(a*mPow(2,10*(t-=1)) * mSin( (t*d-s)*(2*M_PI_F)/p )) + b;
+	t-=1;
+	return -(a*mPow(2,10*t) * mSin( (t*d-s)*(2*M_PI_F)/p )) + b;
 };
 
 inline F32 mEaseOutElastic(F32 t, F32 b, F32 c, F32 d, F32 a, F32 p) {
-	if (t==0) return b;  if ((t/=d)==1) return b+c;  if (p<=0) p=d*.3f;
+	if (t==0) return b;  t/=d;  if (t==1) return b+c;  if (p<=0) p=d*.3f;
 	F32 s;
 	if (a < mFabs(c)) { a=c; s=p/4; }
 	else s = p/(2*M_PI_F) * mAsin (c/a);
@@ -282,12 +304,13 @@ inline F32 mEaseOutElastic(F32 t, F32 b, F32 c, F32 d, F32 a, F32 p) {
 };
 
 inline F32 mEaseInOutElastic(F32 t, F32 b, F32 c, F32 d, F32 a, F32 p) {
-	if (t==0) return b;  if ((t/=d/2)==2) return b+c;  if (p<=0) p=d*(.3f*1.5f);
+	if (t==0) return b;  t/=d/2;  if (t==2) return b+c;  if (p<=0) p=d*(.3f*1.5f);
 	F32 s;
 	if (a < mFabs(c)) { a=c; s=p/4; }
 	else s = p/(2*M_PI_F) * mAsin (c/a);
-	if (t < 1) return -.5f*(a*mPow(2,10*(t-=1)) * mSin( (t*d-s)*(2*M_PI_F)/p )) + b;
-	return a*mPow(2,-10*(t-=1)) * mSin( (t*d-s)*(2*M_PI_F)/p )*.5f + c + b;
+	t-=1;
+	if (t < 1) return -.5f*(a*mPow(2,10*t) * mSin( (t*d-s)*(2*M_PI_F)/p )) + b;
+	return a*mPow(2,-10*t) * mSin( (t*d-s)*(2*M_PI_F)/p )*.5f + c + b;
 };
 
 
@@ -301,21 +324,26 @@ inline F32 mEaseInOutElastic(F32 t, F32 b, F32 c, F32 d, F32 a, F32 p) {
 // s==0 produces cubic easing with no overshoot
 inline F32 mEaseInBack(F32 t, F32 b, F32 c, F32 d, F32 s) {
 	if (s < 0) s = 1.70158f;
-	return c*(t/=d)*t*((s+1)*t - s) + b;
+	t/=d;
+	return c*t*t*((s+1)*t - s) + b;
 };
 
 // back easing out - moving towards target, overshooting it slightly, then reversing and coming back to target
 inline F32 mEaseOutBack(F32 t, F32 b, F32 c, F32 d, F32 s) {
 	if (s < 0) s = 1.70158f;
-	return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
+	t=t/d-1;
+	return c*(t*t*((s+1)*t + s) + 1) + b;
 };
 
 // back easing in/out - backtracking slightly, then reversing direction and moving to target,
 // then overshooting target, reversing, and finally coming back to target
 inline F32 mEaseInOutBack(F32 t, F32 b, F32 c, F32 d, F32 s) {
 	if (s < 0) s = 1.70158f; 
-	if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525f))+1)*t - s)) + b;
-	return c/2*((t-=2)*t*(((s*=(1.525f))+1)*t + s) + 2) + b;
+	t/=d/2;
+	s*=1.525f;
+	if (t < 1) return c/2*(t*t*((s+1)*t - s)) + b;
+	t-=2;
+	return c/2*(t*t*((s+1)*t + s) + 2) + b;
 };
 
 
@@ -323,14 +351,18 @@ inline F32 mEaseInOutBack(F32 t, F32 b, F32 c, F32 d, F32 s) {
 
 // bounce easing out
 inline F32 mEaseOutBounce(F32 t, F32 b, F32 c, F32 d) {
-	if ((t/=d) < (1/2.75f)) {
+	t/=d;
+	if (t < (1/2.75f)) {
 		return c*(7.5625f*t*t) + b;
 	} else if (t < (2/2.75)) {
-		return c*(7.5625f*(t-=(1.5f/2.75f))*t + .75f) + b;
+		t-=(1.5f/2.75f);
+		return c*(7.5625f*t*t + .75f) + b;
 	} else if (t < (2.5/2.75)) {
-		return c*(7.5625f*(t-=(2.25f/2.75f))*t + .9375f) + b;
+		t-=(2.25f/2.75f);
+		return c*(7.5625f*t*t + .9375f) + b;
 	} else {
-		return c*(7.5625f*(t-=(2.625f/2.75f))*t + .984375f) + b;
+		t-=(2.625f/2.75f);
+		return c*(7.5625f*t*t + .984375f) + b;
 	}
 };
 

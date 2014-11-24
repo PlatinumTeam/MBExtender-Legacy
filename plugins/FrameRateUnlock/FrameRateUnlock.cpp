@@ -1,4 +1,4 @@
-/* Windows only: unlocks the game's frame rate.
+/* Unlocks the game's frame rate.
  *
  * By default, the Windows build of the game uses GetTickCount() in the timing
  * loop to determine when to send out a time event. The problem with this is
@@ -9,25 +9,27 @@
  * is run under WINE. This is likely because WINE's GetTickCount()
  * implementation is more precise.)
  *
+ * There are also issues with frame rate on the Mac version of the game.
+ *
  * This plugin fixes the issue by overriding the game's timestep code so that it
- * uses the highest-resolution timer available on the user's system. If the
- * system has a high-performance counter (QueryPerformanceCounter, etc.)
- * available, then that will be used, otherwise the system multimedia timer will
- * be used with as high of a resolution as possible.
+ * uses the highest-resolution timer available on the user's system.
 */
-
-#ifndef WIN32
-#error FrameRateUnlock is specific to the Windows version of the game.
-#endif
 
 #include <TorqueLib/TGE.h>
 #include <TorqueLib/QuickOverride.h>
 #include <PluginLoader/PluginInterface.h>
-#include <Windows.h>
 #include <memory>
+#include <algorithm>
 #include "GameTimer.hpp"
-#include "HighPerformanceTimer.hpp"
-#include "MultimediaTimer.hpp"
+
+#if defined(_WIN32)
+ #include "win32/HighPerformanceTimer-win32.hpp"
+ #include "win32/MultimediaTimer-win32.hpp"
+#elif defined(__MACH__)
+ #include "osx/MachTimer-osx.hpp"
+#elif defined(__linux)
+ #include "linux/MonotonicTimer-linux.hpp"
+#endif
 
 namespace
 {
@@ -44,7 +46,8 @@ namespace
 	/// </summary>
 	void detectTimer()
 	{
-#ifndef FORCE_MMTIMER
+#if defined(_WIN32)
+ #ifndef FORCE_MMTIMER
 		// High-performance timer takes precedence over multimedia timer
 		if (HighPerformanceTimer::isSupported())
 		{
@@ -53,14 +56,23 @@ namespace
 			TGE::Con::printf("FrameRateUnlock: Using high-performance timer");
 		}
 		else
-#endif
+ #endif
 		{
 			// Fall back to multimedia timer
 			MultimediaTimer *mm = new MultimediaTimer();
 			timer = std::unique_ptr<GameTimer>(mm);
 			TGE::Con::printf("FrameRateUnlock: Using multimedia timer");
 		}
-		TGE::Con::printf("FrameRateUnlock: Timer resolution = %d", static_cast<int>(timer->getTicksPerSecond()));
+#elif defined(__MACH__)
+		MachTimer *mt = new MachTimer();
+		timer = std::unique_ptr<GameTimer>(mt);
+		TGE::Con::printf("FrameRateUnlock: Using Mach SYSTEM_CLOCK");
+#elif defined(__linux)
+		MonotonicTimer *mt = new MonotonicTimer();
+		timer = std::unique_ptr<GameTimer>(mt);
+		TGE::Con::printf("FrameRateUnlock: Using CLOCK_MONOTONIC");
+#endif
+		TGE::Con::printf("FrameRateUnlock: Timer frequency = %d", static_cast<int>(timer->getTicksPerSecond()));
 		lastTime = timer->getTime();
 	}
 }
@@ -68,7 +80,7 @@ namespace
 // TimeManager::process() override for using a higher-resolution timer
 TorqueOverride(void, TimeManager::process, (), originalProcess)
 {
-	if (!enabled)
+	if (!enabled || !timer)
 	{
 		originalProcess();
 		return;
@@ -100,16 +112,21 @@ ConsoleFunction(enableFrameRateUnlock, void, 2, 2, "enableFrameRateUnlock(enable
 	int newEnabled = atoi(argv[1]);
 	enabled = (newEnabled != 0);
 	if (enabled)
+	{
+		lastTime = timer->getTime();
 		TGE::Con::printf("Frame rate unlock enabled");
+	}
 	else
+	{
 		TGE::Con::printf("Frame rate unlock disabled");
+	}
 }
 
 // Console function to set the update interval
 ConsoleFunction(setTickInterval, void, 2, 2, "setTickInterval(msec)")
 {
-	int newInterval = atoi(argv[1]);
-	updateInterval = max(MinUpdateInterval, newInterval);
+	uint32_t newInterval = atoi(argv[1]);
+	updateInterval = std::max(MinUpdateInterval, newInterval);
 }
 
 // Console function to set the time scale

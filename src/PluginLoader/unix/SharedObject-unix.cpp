@@ -1,5 +1,6 @@
 #include "../SharedObject.h"
 #include <dlfcn.h>
+#include <stdio.h>
 
 const char *SharedObject::DefaultExtension = ".so";
 
@@ -23,7 +24,12 @@ bool SharedObject::load(const char *path)
 {
 	unload();
 	handle = dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
-	return (handle != nullptr);
+	if (!handle)
+	{
+		fprintf(stderr, "Unable to load shared object %s: %s\n", path, dlerror());
+		return false;
+	}
+	return true;
 }
 
 bool SharedObject::loaded() const

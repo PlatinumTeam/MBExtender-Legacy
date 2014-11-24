@@ -34,6 +34,14 @@ namespace CodeInjection
 		void write(const void *data, size_t dataSize);
 
 		/// <summary>
+		/// Reads data from the stream at the current position, advancing the stream by the size of the data.
+		/// </summary>
+		/// <param name="out">The buffer to write data to.</param>
+		/// <param name="size">The number of bytes to read.</param>
+		/// <returns><c>true</c> if the read was successful.</param>
+		bool read(void *out, size_t size);
+
+		/// <summary>
 		/// Reads a relative 32-bit jump or call instruction from the stream at the current position, advancing the stream by the size of the instruction.
 		/// </summary>
 		/// <returns>The target of the far jump or call if valid, or <c>nullptr</c> otherwise.</returns>
@@ -108,7 +116,7 @@ namespace CodeInjection
 		/// Determines whether or not the stream is at the end of its data block.
 		/// </summary>
 		/// <returns><c>true</c> if the stream is at the end of its data block.</returns>
-		bool isAtEnd() const { return (currentPtr - start) == size; }
+		bool isAtEnd() const { return static_cast<size_t>(currentPtr - start) == size; }
 
 		/// <summary>
 		/// The size of a jump instruction written by <see cref="writeRel32Jump"/> and <see cref="writeRel32Call"/>.

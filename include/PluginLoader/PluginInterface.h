@@ -11,11 +11,11 @@
 #ifdef _MSC_VER
 	#define PLUGINCALLBACK extern "C" __declspec(dllexport)
 #else
-	#if __GNUC__ >= 4
+	//#if __GNUC__ >= 4
 		#define PLUGINCALLBACK extern "C" __attribute__((visibility("default")))
-	#else
-		#define PLUGINCALLBACK
-	#endif
+	//#else
+		//#define PLUGINCALLBACK
+	//#endif
 #endif
 
 /// <summary>

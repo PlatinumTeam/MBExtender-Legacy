@@ -1,9 +1,5 @@
 // Demonstration of how to use the function interception mechanism to create an external console window for the game.
 
-#ifdef HAVE_CONFIG_H
-#include "../../config.h"
-#endif
-
 #define _CRT_SECURE_NO_WARNINGS
 #include <cstdio>
 #include <string>
@@ -76,7 +72,12 @@ namespace
 	}
 }
 
+// _printf is fastcall on Mac. Ew.
+#ifdef __APPLE__
+TorqueOverrideFastcall(void, Con::_printf, (TGE::ConsoleLogEntry::Level level, TGE::ConsoleLogEntry::Type type, const char *fmt, va_list argptr), originalPrintf)
+#else
 TorqueOverride(void, Con::_printf, (TGE::ConsoleLogEntry::Level level, TGE::ConsoleLogEntry::Type type, const char *fmt, va_list argptr), originalPrintf)
+#endif
 {
 	setAttributes(level);
 	vprintf(fmt, argptr);

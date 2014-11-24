@@ -21,11 +21,13 @@
 #endif
 
 // Determine macros and addresses to use based on host OS
-#ifdef _WIN32
+#if defined(_WIN32)
 #include "win32/InterfaceMacros-win32.h"
 #include "win32/Addresses-win32.h"
-#endif
-#ifdef __linux
+#elif defined(__APPLE__)
+#include "linux/InterfaceMacros-linux.h"
+#include "osx/Addresses-osx.h"
+#elif defined(__linux)
 #include "linux/InterfaceMacros-linux.h"
 #include "linux/Addresses-linux.h"
 #endif
@@ -62,7 +64,6 @@ namespace TGE
 		
 		UNDEFVIRT(getClassRep);
 		VIRTDTOR(~ConsoleObject, TGEVIRT_CONSOLEOBJECT_DESTRUCTOR);
-		// NOTE: On the Mac version, there's another virtual function right here - seems to be another (?) virtual destructor
 	};
 
 	class SimObject: public ConsoleObject
@@ -411,10 +412,10 @@ namespace TGE
 
 	class ConnectionProtocol
 	{
-	private:
+	public:
 		// TODO: Clean this up, this is just so casting SimObject* to NetConnection* works properly
-		unsigned char fields[0x9C];
-		virtual void placeholder() = 0; // Force virtual inheritance
+		unsigned char z_fields[0x9C];
+		virtual void z_placeholder() = 0; // Force virtual inheritance
 	};
 	
 	GLOBALVAR(TGE::SimObject*, mServerConnection, TGEADDR_MSERVERCONNECTION);
@@ -518,7 +519,14 @@ namespace TGE
 		
 		// Logging
 		FN(void, printf, (const char *fmt, ...), TGEADDR_CON_PRINTF);
+
+		// _printf is fastcall on Mac
+#ifndef __APPLE__
 		FN(void, _printf, (ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, const char *fmt, va_list argptr), TGEADDR_CON__PRINTF);
+#else
+		FASTCALLFN(void, _printf, (ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, const char *fmt, va_list argptr), TGEADDR_CON__PRINTF);
+#endif
+
 		OVERLOAD_PTR {
 			OVERLOAD_FN(void, (const char *fmt, ...),                             TGEADDR_CON_WARNF_1V);
 			OVERLOAD_FN(void, (ConsoleLogEntry::Type type, const char *fmt, ...), TGEADDR_CON_WARNF_2V);
@@ -693,6 +701,7 @@ namespace TGE
 
 	// Platform functions
 	FN(int, dSprintf, (char *buffer, size_t bufferSize, const char *format, ...), TGEADDR_DSPRINTF);
+	FN(int, dVsprintf, (char *buffer, size_t maxSize, const char *format, void *args), TGEADDR_DVSPRINTF);
 	FN(void, dFree, (void *ptr), TGEADDR_DFREE);
 	FN(void, dQsort, (void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const void*, const void*)), TGEADDR_DQSORT);
 	FN(bool, VectorResize, (U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount, U32 elemSize), TGEADDR_VECTORRESIZE);

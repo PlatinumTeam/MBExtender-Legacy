@@ -7,6 +7,18 @@
 // Macro for quickly declaring a function pointer that points to a static address
 #define FN(rettype, name, args, addr) namespace { rettype (*const name)args = (rettype (*) args)addr; }
 
+// fastcall calling convention
+#ifndef __fastcall
+ #if defined(__APPLE__)
+  #define __fastcall __attribute__((regparm(3)))
+ #elif defined(__linux)
+  #define __fastcall __attribute__((fastcall))
+ #endif
+#endif
+
+// Macro for declaring a function pointer which uses the fastcall convention
+#define FASTCALLFN(rettype, name, args, addr) namespace { rettype (__fastcall *const name)args = (rettype (__fastcall *) args)addr; }
+
 // Macros for declaring overloaded function pointers
 //
 // Usage example:
@@ -22,14 +34,14 @@
 	public:                                             \
 		inline operator t_##addr##_ () const            \
 		{                                               \
-			return reinterpret_cast<t_##addr##_>(addr); \
+			return (t_##addr##_)(addr); \
 		}
 	
 // Defines the offset of a class's vtable pointer. Required in order to use VIRTFN and VIRTFNSIMP.	
 #define VTABLE(offset) \
 	uint32_t z_vtableLookup_(int index) \
 	{ \
-		return (*reinterpret_cast<uint32_t**>(reinterpret_cast<uint32_t>(this) + offset))[index + 2]; \
+		return (*(uint32_t**)((char*)(this) + offset))[index]; \
 	} \
 	virtual void z_foo_() = 0
 		
@@ -62,21 +74,21 @@
 #define MEMBERFN(rettype, name, args, argnames, addr)                                              \
 	rettype name args                                                                              \
 	{                                                                                              \
-		return ((rettype (*) (EXPAND(void*, EXPAND args)))(addr)) (EXPAND(this, EXPAND argnames)); \
+		return ((rettype (*) (EXPAND(void*, EXPAND args)))(size_t)(addr)) (EXPAND(this, EXPAND argnames)); \
 	}
 
 // Same as MEMBERFN, but defines a "simple" wrapper with no arguments
 #define MEMBERFNSIMP(rettype, name, addr)           \
 	rettype name()                                  \
 	{                                               \
-		return ((rettype (*) (void*))(addr))(this); \
+		return ((rettype (*) (void*))(size_t)(addr))(this); \
 	}
 	
 // Defines a destructor wrapper
 #define MEMBERDTOR(name, addr)            \
 	name()                                \
 	{                                     \
-		((void (*) (void*))(addr))(this); \
+		((void (*) (void*))(size_t)(addr))(this); \
 	}
 
 // Defines a global variable
@@ -90,7 +102,7 @@
 #define GETTERFN(rettype, internaltype, name, offset)                                    \
 	rettype name()                                                                       \
 	{                                                                                    \
-		return *reinterpret_cast<internaltype*>(reinterpret_cast<char*>(this) + offset); \
+		return *(internaltype*)((char*)(this) + offset); \
 	}
 
 // Defines a getter for a class field where the return type and internal type are the same
@@ -100,7 +112,7 @@
 #define SETTERFN(type, name, offset)                                                 \
 	void name(type newValue)                                                         \
 	{                                                                                \
-		*reinterpret_cast<type*>(reinterpret_cast<char*>(this) + offset) = newValue; \
+		*(type*)((char*)(this) + offset) = newValue; \
 	}
 
 #endif // TORQUELIB_INTERFACEMACROS_LINUX_H

@@ -39,6 +39,21 @@ namespace CodeInjection
 	}
 
 	/// <summary>
+	/// Reads data from the stream at the current position, advancing the stream by the size of the data.
+	/// </summary>
+	/// <param name="out">The buffer to write data to.</param>
+	/// <param name="size">The number of bytes to read.</param>
+	/// <returns><c>true</c> if the read was successful.</param>
+	bool CodeInjectionStream::read(void *out, size_t size)
+	{
+		if (!isSpaceAvailable(size))
+			return false;
+		memcpy(out, currentPtr, size);
+		currentPtr += size;
+		return true;
+	}
+
+	/// <summary>
 	/// Reads a relative 32-bit jump or call instruction from the stream at the current position, advancing the stream by the size of the instruction.
 	/// </summary>
 	/// <returns>The target of the far jump or call if valid, or <c>nullptr</c> otherwise.</returns>

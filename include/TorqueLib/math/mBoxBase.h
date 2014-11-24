@@ -205,6 +205,7 @@ class DLLSPEC BoxBase
                }
                break;
          }
+         return NearBottomRight;
       }
 
       /// Indices for the edges of the box.

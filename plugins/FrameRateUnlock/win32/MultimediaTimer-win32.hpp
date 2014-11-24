@@ -1,7 +1,7 @@
 #ifndef MULTIMEDIATIMER_HPP
 #define MULTIMEDIATIMER_HPP
 
-#include "GameTimer.hpp"
+#include "../GameTimer.hpp"
 
 /// <summary>
 /// A frame rate timer that uses the system's multimedia timer.
@@ -31,7 +31,7 @@ public:
 	/// Gets the number of ticks in one second.
 	/// </summary>
 	/// <returns>The number of ticks in one second.</returns>
-	virtual uint64_t getTicksPerSecond() { return resolution * 1000; }
+	virtual uint64_t getTicksPerSecond() { return 1000 / resolution; }
 
 private:	
 	/// <summary>

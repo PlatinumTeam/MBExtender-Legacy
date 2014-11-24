@@ -1,11 +1,13 @@
 #include "FuncInterceptor.h"
+#include <string.h>
 
-#ifdef _WIN32
-// Windows
+#if defined(_WIN32)
 #define MB_TEXT_START 0x401000
 #define MB_TEXT_SIZE  0x238000
-#else
-// Linux
+#elif defined(__APPLE__)
+#define MB_TEXT_START 0x2BC0
+#define MB_TEXT_SIZE 0x265FA6
+#elif defined(__linux)
 #define MB_TEXT_START 0x804EBD0
 #define MB_TEXT_SIZE  0x277500
 #endif
@@ -14,6 +16,9 @@ namespace
 {
 	// Size of a 32-bit relative jump
 	const size_t JumpSize = 5;
+
+	// Code for a thunk function which creates and destroys a stack frame
+	const uint8_t ThunkCode[4] = {0x55, 0x89, 0xE5, 0x5D};
 }
 
 namespace CodeInjection
@@ -45,9 +50,17 @@ namespace CodeInjection
 		if (stream == nullptr || func == nullptr || newFunc == nullptr)
 			return nullptr;
 
-		// As an optimization, if the function is a thunk (it consists of only a relative jump), then a trampoline isn't necessary
+		// As an optimization, if the function is a thunk (it only does a relative jump),
+		// then a trampoline isn't necessary
 		stream->seekTo(func);
 		void *originalFunc = stream->peekRel32Jump();
+		if (originalFunc == nullptr)
+		{
+			// Check if it creates and destroys a stack frame first before jumping
+			uint8_t thunkTest[sizeof(ThunkCode)];
+			if (stream->read(thunkTest, sizeof(thunkTest)) && memcmp(thunkTest, ThunkCode, sizeof(thunkTest)) == 0)
+				originalFunc = stream->peekRel32Jump();
+		}
 		if (originalFunc == nullptr)
 		{
 			// Not a thunk - create a trampoline
@@ -57,6 +70,7 @@ namespace CodeInjection
 		}
 		
 		// Write a jump to the new function and store the original function pointer
+		stream->seekTo(func);
 		stream->writeRel32Jump(newFunc);
 		originalFunctions[func] = originalFunc;
 		return originalFunc;

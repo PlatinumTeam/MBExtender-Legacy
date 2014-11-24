@@ -9,9 +9,20 @@
 #include "SharedObject.h"
 #include <TorqueLib/TGE.h>
 
-#define PLUGIN_DIR "plugins/"
-#define PLUGIN_FILTER (PLUGIN_DIR "*.dll")
-#define PLUGIN_DIR_LEN 9
+#if defined(__APPLE__)
+// The Mac executable changes the working directory to the root of the app folder
+#define PATH_PREFIX "./Contents/MacOS/"
+#else
+#define PATH_PREFIX "./"
+#endif
+
+#if defined(_WIN32)
+const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.dll";
+#elif defined(__APPLE__)
+const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.dylib";
+#elif defined(__linux)
+const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.so";
+#endif
 
 typedef void(*initMath_t)();
 typedef void(*installOverrides_t)(TorqueFunctionInterceptor *interceptor);
@@ -35,7 +46,7 @@ namespace
 
 	void loadPlugins()
 	{
-		boost::filesystem::path pluginDir("plugins");
+		boost::filesystem::path pluginDir(PATH_PREFIX "plugins");
 		if (!boost::filesystem::exists(pluginDir) || !boost::filesystem::is_directory(pluginDir))
 		{
 			TGE::Con::warnf("   No \"plugins\" directory found!");
@@ -109,9 +120,7 @@ namespace
 	void loadMathLibrary()
 	{
 		TGE::Con::printf("   Initializing memory interface");
-		std::string libPath = "./TorqueLib";
-		libPath += SharedObject::DefaultExtension;
-		mathLib = new SharedObject(libPath.c_str());
+		mathLib = new SharedObject(TorqueLibPath);
 		if (mathLib->loaded())
 		{
 			auto initFunc = reinterpret_cast<initMath_t>(mathLib->getSymbol("init"));
@@ -121,7 +130,7 @@ namespace
 				return;
 			}
 		}
-		TGE::Con::errorf("   Unable to load %s! Some plugins may fail to load!", libPath.c_str());
+		TGE::Con::errorf("   Unable to load %s! Some plugins may fail to load!", TorqueLibPath);
 	}
 
 	void installUserOverrides()

@@ -7,7 +7,7 @@
 #include <cstdint>
 
 #ifdef _MSC_VER
-	#ifdef EXPORT_SYMBOLS
+	#ifdef TorqueLib_EXPORTS
 		#define DLLSPEC __declspec(dllexport)
 	#else
 		#define DLLSPEC __declspec(dllimport)
@@ -210,7 +210,7 @@ namespace TGE
 		U32 high;
 	};
 #endif
-#ifdef __linux
+#if defined(__linux) || defined(__APPLE__)
 	typedef S32 FileTime;
 #endif
 }

@@ -1,7 +1,7 @@
 #ifndef HIGHPERFORMANCETIMER_HPP
 #define HIGHPERFORMANCETIMER_HPP
 
-#include "GameTimer.hpp"
+#include "../GameTimer.hpp"
 
 /// <summary>
 /// A frame rate timer that uses the system's high performance counter.

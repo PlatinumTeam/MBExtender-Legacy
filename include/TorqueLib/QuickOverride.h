@@ -44,6 +44,12 @@ namespace TorqueLib
 	static TorqueLib::OverrideGenerator<decltype(originalName)> MAKEUNIQUE(z_torqueOverrideGen) (&originalName, MAKEUNIQUE(z_torqueOverride));\
 	static rettype MAKEUNIQUE(z_torqueOverride) args
 
+#define TorqueOverrideFastcall(rettype, func, args, originalName) \
+	static __fastcall rettype MAKEUNIQUE(z_torqueOverride) args;\
+	static auto originalName = TGE:: func;\
+	static TorqueLib::OverrideGenerator<decltype(originalName)> MAKEUNIQUE(z_torqueOverrideGen) (&originalName, MAKEUNIQUE(z_torqueOverride));\
+	static rettype MAKEUNIQUE(z_torqueOverride) args
+
 #define THISFN2(rettype, name, args) THISFN(rettype, name, args)
 
 #ifdef _WIN32

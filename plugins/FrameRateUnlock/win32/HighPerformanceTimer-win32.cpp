@@ -1,5 +1,5 @@
 #include <Windows.h>
-#include "HighPerformanceTimer.hpp"
+#include "HighPerformanceTimer-win32.hpp"
 
 HighPerformanceTimer::HighPerformanceTimer()
 	: frequency(0)
