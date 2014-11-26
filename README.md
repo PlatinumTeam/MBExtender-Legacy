@@ -17,10 +17,6 @@ MBExtender uses [CMake](http://www.cmake.org/) for its build system. You must in
 
 On Windows, Visual Studio 2013 is currently required in order to compile MBExtender.
 
-A 32-bit version of [Boost](http://www.boost.org/) (specifically, [Boost.System](http://www.boost.org/doc/libs/1_57_0/libs/system/doc/index.html) and [Boost.Filesystem](http://www.boost.org/doc/libs/1_56_0/libs/filesystem/doc/index.htm)) is also required. Ensure that your compiler has access to the Boost includes and libraries. You may need the static libraries present on your system in order for CMake to configure the project successfully, but static linking to Boost can be toggled by changing the Boost_USE_STATIC_LIBS configuration option.
-
-If CMake cannot find where Boost is installed, first verify that you have the 32-bit libraries installed and not just the 64-bit ones. If you do have the 32-bit libraries installed, then you will need to set the $BOOST_ROOT environment variable to point to the location where Boost is installed. Library files will be searched for in $BOOST_ROOT/lib, and include files will be searched for in $BOOST_ROOT/boost.
-
 #### Windows ####
 Open CMake, click "Browse Source," and select your MBExtender source folder. Also specify a separate build folder if one is not filled in automatically for you. Click "Configure" and select "Visual Studio 12 2013" as the target. If all goes well, then click Generate to create Visual Studio projects in the build directory.
 
