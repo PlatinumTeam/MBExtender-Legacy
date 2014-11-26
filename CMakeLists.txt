@@ -67,6 +67,7 @@ set (PLUGINLOADER_SRC
 	src/PluginLoader/PluginLoader.cpp
 	src/PluginLoader/TrampolineGenerator.cpp
 	src/PluginLoader/Filesystem-common.cpp
+	src/PluginLoader/StringUtil.cpp
 )
 if (UNIX)
 	set (PLUGINLOADER_SRC ${PLUGINLOADER_SRC}

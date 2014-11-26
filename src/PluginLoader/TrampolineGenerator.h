@@ -11,7 +11,10 @@ namespace CodeInjection
 	class TrampolineGenerator
 	{
 	public:
-		explicit TrampolineGenerator(CodeAllocator *allocator);
+		explicit TrampolineGenerator(CodeAllocator *allocator)
+			: allocator(allocator)
+		{
+		}
 
 		/// <summary>
 		/// Creates a trampoline function for a block of code.

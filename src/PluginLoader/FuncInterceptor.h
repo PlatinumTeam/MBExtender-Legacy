@@ -13,7 +13,11 @@ namespace CodeInjection
 	class FuncInterceptor
 	{
 	public:
-		explicit FuncInterceptor(CodeAllocator *allocator);
+		FuncInterceptor(CodeInjectionStream *stream, CodeAllocator *allocator)
+			: stream(stream), trampolineGen(allocator)
+		{
+		}
+
 		~FuncInterceptor();
 
 		/// <summary>

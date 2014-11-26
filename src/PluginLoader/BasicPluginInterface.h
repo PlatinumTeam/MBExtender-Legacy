@@ -9,7 +9,10 @@
 class BasicTorqueFunctionInterceptor : public TorqueFunctionInterceptor
 {
 public:
-	BasicTorqueFunctionInterceptor(CodeInjection::FuncInterceptor *interceptor);
+	BasicTorqueFunctionInterceptor(CodeInjection::FuncInterceptor *interceptor)
+		: interceptor(interceptor)
+	{
+	}
 
 	void restore(void *func);
 
@@ -23,16 +26,19 @@ private:
 class BasicPluginInterface : public PluginInterface
 {
 public:
-	BasicPluginInterface(BasicTorqueFunctionInterceptor *interceptor, const std::string &dllPath);
+	BasicPluginInterface(TorqueFunctionInterceptor *interceptor, const std::string &dllPath)
+		: interceptor(interceptor), path(dllPath)
+	{
+	}
 
-	const char* getPath();
-	TorqueFunctionInterceptor* getInterceptor();
+	std::string getPath() const { return path; }
+	TorqueFunctionInterceptor *getInterceptor() const { return interceptor; }
 	void onClientProcess(clientProcess_ptr callback);
 
 	static void executeProcessList(uint32_t timeDelta);
 
 private:
-	BasicTorqueFunctionInterceptor *interceptor;
+	TorqueFunctionInterceptor *interceptor;
 	std::string path;
 };
 

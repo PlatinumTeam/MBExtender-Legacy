@@ -5,11 +5,6 @@
 
 std::vector<PluginInterface::clientProcess_ptr>* processList;
 
-BasicTorqueFunctionInterceptor::BasicTorqueFunctionInterceptor(CodeInjection::FuncInterceptor *interceptor)
-	: interceptor(interceptor)
-{
-}
-
 void BasicTorqueFunctionInterceptor::restore(void *func)
 {
 	interceptor->restore(func);
@@ -18,25 +13,6 @@ void BasicTorqueFunctionInterceptor::restore(void *func)
 void* BasicTorqueFunctionInterceptor::intercept(void *func, void *newFunc)
 {
 	return interceptor->intercept(func, newFunc);
-}
-
-BasicPluginInterface::BasicPluginInterface(BasicTorqueFunctionInterceptor *interceptor, const std::string &dllPath)
-	: interceptor(interceptor), path(dllPath)
-{
-}
-
-/// <summary>
-/// Gets the path.
-/// </summary>
-/// <returns></returns>
-const char* BasicPluginInterface::getPath()
-{
-	return path.c_str();
-}
-
-TorqueFunctionInterceptor* BasicPluginInterface::getInterceptor()
-{
-	return interceptor;
 }
 
 void BasicPluginInterface::onClientProcess(clientProcess_ptr callback)

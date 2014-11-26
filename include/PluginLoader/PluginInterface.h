@@ -2,6 +2,7 @@
 #define PLUGINLOADER_PLUGININTERFACE_H
 
 #include <cstdint>
+#include <string>
 
 // Use this macro with the preEngineInit() and postEngineInit() functions
 // to ensure that they are exported from the plugin correctly
@@ -24,6 +25,8 @@
 class TorqueFunctionInterceptor
 {
 public:
+	virtual ~TorqueFunctionInterceptor() { }
+
 	/// <summary>
 	/// Intercepts a function so that all calls to it will redirect to another one.
 	/// </summary>
@@ -58,17 +61,19 @@ protected:
 class PluginInterface
 {
 public:
+	virtual ~PluginInterface() { }
+
 	/// <summary>
 	/// Gets the path to the dynamic library for the current plugin.
 	/// </summary>
 	/// <returns>The path to the dynamic library for the current plugin. May not be absolute.</returns>
-	virtual const char* getPath() = 0;
+	virtual std::string getPath() const = 0;
 
 	/// <summary>
 	/// Gets an object which can be used to intercept Torque functions.
 	/// </summary>
 	/// <returns>An object which can be used to intercept Torque functions.</returns>
-	virtual TorqueFunctionInterceptor* getInterceptor() = 0;
+	virtual TorqueFunctionInterceptor *getInterceptor() const = 0;
 
 	/// <summary>
 	/// Function pointer type used by <see cref="onClientProcess"/> callbacks.

@@ -148,3 +148,7 @@ PLUGINCALLBACK void postEngineInit(PluginInterface *plugin)
 {
 	detectTimer();
 }
+
+PLUGINCALLBACK void engineShutdown(PluginInterface *plugin)
+{
+}

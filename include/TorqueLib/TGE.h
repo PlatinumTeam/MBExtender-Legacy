@@ -697,6 +697,7 @@ namespace TGE
 		}
 	}
 
+	FN(void, shutdownGame, (), TGEADDR_SHUTDOWNGAME);
 	FN(void, clientProcess, (U32 timeDelta), TGEADDR_CLIENTPROCESS);
 
 	// Platform functions

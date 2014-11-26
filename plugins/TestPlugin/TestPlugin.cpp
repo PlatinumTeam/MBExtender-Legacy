@@ -83,5 +83,9 @@ PLUGINCALLBACK void postEngineInit(PluginInterface *plugin)
 	// So it lets us test TorqueLib.dll loading
 	MathUtils::randomPointInSphere(10);
 
-	TGE::Con::printf("      Hello from %s!", plugin->getPath());
+	TGE::Con::printf("      Hello from %s!", plugin->getPath().c_str());
+}
+
+PLUGINCALLBACK void engineShutdown(PluginInterface *plugin)
+{
 }

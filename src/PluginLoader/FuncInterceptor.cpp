@@ -1,17 +1,6 @@
 #include "FuncInterceptor.h"
 #include <string.h>
 
-#if defined(_WIN32)
-#define MB_TEXT_START 0x401000
-#define MB_TEXT_SIZE  0x238000
-#elif defined(__APPLE__)
-#define MB_TEXT_START 0x2BC0
-#define MB_TEXT_SIZE 0x265FA6
-#elif defined(__linux)
-#define MB_TEXT_START 0x804EBD0
-#define MB_TEXT_SIZE  0x277500
-#endif
-
 namespace
 {
 	// Size of a 32-bit relative jump
@@ -23,20 +12,10 @@ namespace
 
 namespace CodeInjection
 {
-	FuncInterceptor::FuncInterceptor(CodeAllocator *allocator)
-		: stream(nullptr), trampolineGen(allocator)
-	{
-		stream = new CodeInjection::CodeInjectionStream(reinterpret_cast<void*>(MB_TEXT_START), MB_TEXT_SIZE);
-	}
-
 	FuncInterceptor::~FuncInterceptor()
 	{
-		if (stream != nullptr)
-		{
+		if (stream)
 			restoreAll();
-			delete stream;
-			stream = nullptr;
-		}
 	}
 
 	/// <summary>

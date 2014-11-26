@@ -38,3 +38,7 @@ PLUGINCALLBACK void preEngineInit(PluginInterface *plugin)
 PLUGINCALLBACK void postEngineInit(PluginInterface *plugin)
 {
 }
+
+PLUGINCALLBACK void engineShutdown(PluginInterface *plugin)
+{
+}

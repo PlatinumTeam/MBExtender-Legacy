@@ -3,42 +3,53 @@
 
 #include <vector>
 #include <string>
+#include <TorqueLib/TGE.h>
 #include "FuncInterceptor.h"
 #include "BasicPluginInterface.h"
 #include "SharedObject.h"
 #include "Filesystem.h"
-#include <TorqueLib/TGE.h>
+#include "StringUtil.h"
 
 #if defined(_WIN32)
  #define PATH_PREFIX
  const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.dll";
+ #define MB_TEXT_START 0x401000
+ #define MB_TEXT_SIZE  0x238000
 #elif defined(__APPLE__)
  #define PATH_PREFIX "./Contents/MacOS/"
  const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.dylib";
+ #define MB_TEXT_START 0x2BC0
+ #define MB_TEXT_SIZE  0x265FA6
 #elif defined(__linux)
  #define PATH_PREFIX "./"
  const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.so";
+ #define MB_TEXT_START 0x804EBD0
+ #define MB_TEXT_SIZE  0x277500
 #endif
 
 typedef void(*initMath_t)();
-typedef void(*installOverrides_t)(TorqueFunctionInterceptor *interceptor);
-typedef void(*initPlugin_t)(PluginInterface *plugin);
+typedef void(*installOverrides_t)(PluginInterface *plugin);
+typedef void(*pluginCallback_t)(PluginInterface *plugin);
 
 namespace
 {
-	CodeInjection::CodeAllocator* codeAlloc;
-	CodeInjection::FuncInterceptor* hook;
-	BasicTorqueFunctionInterceptor* basicInterceptor;
+	// These objects all have to be allocated manually in order to prevent initialization order issues
+	CodeInjection::CodeAllocator *codeAlloc;
+	CodeInjection::CodeInjectionStream *injectionStream;
+	CodeInjection::FuncInterceptor *hook;
 
-	SharedObject* mathLib;
+	SharedObject *mathLib;
+	installOverrides_t installUserOverrides;
 	
 	struct LoadedPlugin
 	{
 		std::string path;
 		SharedObject *library;
+		CodeInjection::FuncInterceptor *interceptor;
+		BasicTorqueFunctionInterceptor *torqueInterceptor;
 		BasicPluginInterface *pluginInterface;
 	};
-	std::vector<LoadedPlugin>* loadedPlugins;
+	std::vector<LoadedPlugin> *loadedPlugins;
 
 	void loadPlugins()
 	{
@@ -60,18 +71,32 @@ namespace
 				continue;
 			
 			TGE::Con::printf("   Loading %s", path.c_str());
-			SharedObject *library = new SharedObject(path.c_str());
+			auto library = new SharedObject(path.c_str());
 			if (library->loaded())
 			{
-				LoadedPlugin info = { path, library, new BasicPluginInterface(basicInterceptor, path) };
+				auto interceptor = new CodeInjection::FuncInterceptor(injectionStream, codeAlloc);
+				auto torqueInterceptor = new BasicTorqueFunctionInterceptor(interceptor);
+				auto pluginInterface = new BasicPluginInterface(torqueInterceptor, path);
+				LoadedPlugin info = { path, library, interceptor, torqueInterceptor, pluginInterface };
 				loadedPlugins->push_back(info);
+				if (installUserOverrides)
+					installUserOverrides(pluginInterface);
 			}
 			else
 			{
-				delete library;
 				TGE::Con::errorf("   Unable to load %s!", path.c_str());
+				delete library;
 			}
 		}
+	}
+
+	bool runPluginCallback(const LoadedPlugin *plugin, const char *fnName)
+	{
+		auto func = reinterpret_cast<pluginCallback_t>(plugin->library->getSymbol(fnName));
+		if (!func)
+			return false;
+		func(plugin->pluginInterface);
+		return true;
 	}
 
 	void callPluginInit(const char *message, const char *fnName)
@@ -82,12 +107,7 @@ namespace
 		for (auto &plugin : *loadedPlugins)
 		{
 			TGE::Con::printf("   Initializing %s", plugin.path.c_str());
-
-			// If it exports an initialization function, call it
-			auto initFunc = reinterpret_cast<initPlugin_t>(plugin.library->getSymbol(fnName));
-			if (initFunc)
-				initFunc(plugin.pluginInterface);
-			else
+			if (!runPluginCallback(&plugin, fnName))
 				TGE::Con::warnf("   WARNING: %s does not have a %s() function!", plugin.path.c_str(), fnName);
 		}
 		TGE::Con::printf("");
@@ -101,6 +121,31 @@ namespace
 	void pluginPostInit()
 	{
 		callPluginInit("MBExtender: Initializing Plugins, Stage 2:", "postEngineInit");
+	}
+
+	void unloadPlugin(LoadedPlugin *plugin)
+	{
+		if (!runPluginCallback(plugin, "engineShutdown"))
+			TGE::Con::warnf("   WARNING: %s does not have a %s() function!", plugin->path.c_str(), "engineShutdown");
+		delete plugin->pluginInterface;
+		delete plugin->torqueInterceptor;
+		delete plugin->interceptor;
+		delete plugin->library;
+		plugin->pluginInterface = nullptr;
+		plugin->torqueInterceptor = nullptr;
+		plugin->interceptor = nullptr;
+		plugin->library = nullptr;
+	}
+
+	void unloadPlugins()
+	{
+		TGE::Con::printf("MBExtender: Unloading Plugins:");
+		for (auto &plugin : *loadedPlugins)
+		{
+			TGE::Con::printf("   Unloading %s", plugin.path.c_str());
+			unloadPlugin(&plugin);
+		}
+		loadedPlugins->clear();
 	}
 
 	void setPluginVariables()
@@ -122,25 +167,43 @@ namespace
 		{
 			auto initFunc = reinterpret_cast<initMath_t>(mathLib->getSymbol("init"));
 			if (initFunc)
-			{
 				initFunc();
-				return;
-			}
+			else
+				TGE::Con::errorf("   TorqueLib does not have an init() function!");
+
+			installUserOverrides = reinterpret_cast<installOverrides_t>(mathLib->getSymbol("installUserOverrides"));
+			if (!installUserOverrides)
+				TGE::Con::errorf("   TorqueLib does not support user overrides!");
 		}
-		TGE::Con::errorf("   Unable to load %s! Some plugins may fail to load!", TorqueLibPath);
+		else
+		{
+			TGE::Con::errorf("   Unable to load %s! Some plugins may fail to load!", TorqueLibPath);
+			delete mathLib;
+			mathLib = nullptr;
+		}
 	}
 
-	void installUserOverrides()
+	// TorqueScript function to unload a plugin given its name
+	bool tsUnloadPlugin(TGE::SimObject *obj, S32 argc, const char *argv[])
 	{
-		if (!mathLib || !mathLib->loaded())
-			return;
+		std::string upperName = strToUpper(argv[1]);
+		for (auto it = loadedPlugins->begin(); it != loadedPlugins->end(); ++it)
+		{
+			LoadedPlugin *plugin = &*it;
+			if (strToUpper(Filesystem::Path::getFilenameWithoutExtension(plugin->path)) == upperName)
+			{
+				TGE::Con::printf("MBExtender: Unloading plugin %s", plugin->path.c_str());
+				unloadPlugin(plugin);
+				loadedPlugins->erase(it);
+				return true;
+			}
+		}
+		return false;
+	}
 
-		TGE::Con::printf("   Installing user overrides");
-		auto installFunc = reinterpret_cast<installOverrides_t>(mathLib->getSymbol("installUserOverrides"));
-		if (installFunc)
-			installFunc(basicInterceptor);
-		else
-			TGE::Con::errorf("   TorqueLib is out-of-date and does not support user overrides!");
+	void registerFunctions()
+	{
+		TGE::Con::addCommand("unloadPlugin", tsUnloadPlugin, "unloadPlugin(name)", 2, 2);
 	}
 
 	auto originalNsInit = TGE::Namespace::init;
@@ -151,7 +214,6 @@ namespace
 		TGE::Con::printf("MBExtender Init:");
 		loadMathLibrary();
 		loadPlugins();
-		installUserOverrides();
 		TGE::Con::printf("");
 		pluginPreInit();
 	}
@@ -161,8 +223,16 @@ namespace
 	{
 		originalParticleInit();
 
+		registerFunctions();
 		pluginPostInit();
 		setPluginVariables();
+	}
+
+	auto originalShutdownGame = TGE::shutdownGame;
+	void newShutdownGame()
+	{
+		originalShutdownGame();
+		unloadPlugins();
 	}
 
 	// Handles onClientProcess() callbacks
@@ -178,12 +248,15 @@ void installHooks()
 {
 	loadedPlugins = new std::vector<LoadedPlugin>();
 	codeAlloc = new CodeInjection::CodeAllocator();
-	hook = new CodeInjection::FuncInterceptor(codeAlloc);
-	basicInterceptor = new BasicTorqueFunctionInterceptor(hook);
+	injectionStream = new CodeInjection::CodeInjectionStream(reinterpret_cast<void*>(MB_TEXT_START), MB_TEXT_SIZE);
+	hook = new CodeInjection::FuncInterceptor(injectionStream, codeAlloc);
 	
 	// Intercept ParticleEngine::init() because it's the last module that loads before main.cs is executed
 	originalNsInit = hook->intercept(TGE::Namespace::init, newNsInit);
 	originalParticleInit = hook->intercept(TGE::ParticleEngine::init, newParticleInit);
+
+	// Intercept shutdownGame() to unload plugins when the game exits
+	originalShutdownGame = hook->intercept(TGE::shutdownGame, newShutdownGame);
 
 	// Intercept clientProcess() to call plugin callbacks
 	originalClientProcess = hook->intercept(TGE::clientProcess, newClientProcess);

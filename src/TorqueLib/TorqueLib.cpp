@@ -96,15 +96,17 @@ extern "C" DLLSPEC void init()
 	seedGenerator();
 }
 
-extern "C" DLLSPEC void installUserOverrides(TorqueFunctionInterceptor *interceptor)
+extern "C" DLLSPEC void installUserOverrides(PluginInterface *plugin)
 {
-	TorqueLib::OverrideRequest *currentOverride = TorqueLib::requestList;
+	auto interceptor = plugin->getInterceptor();
+	auto currentOverride = TorqueLib::requestList;
 	while (currentOverride)
 	{
 		typedef void (*tmpfnptr_t)(); // The two pointers need to be casted to something, since intercept doesn't allow two void*'s for safety reasons
-		tmpfnptr_t originalFn = reinterpret_cast<tmpfnptr_t>(*currentOverride->originalFunctionPtr);
-		tmpfnptr_t newFn = reinterpret_cast<tmpfnptr_t>(currentOverride->newFunction);
+		auto originalFn = reinterpret_cast<tmpfnptr_t>(*currentOverride->originalFunctionPtr);
+		auto newFn = reinterpret_cast<tmpfnptr_t>(currentOverride->newFunction);
 		*currentOverride->originalFunctionPtr = reinterpret_cast<void*>(interceptor->intercept(originalFn, newFn));
 		currentOverride = currentOverride->nextOverride;
 	}
+	TorqueLib::requestList = nullptr;
 }

@@ -9,11 +9,6 @@ namespace
 
 namespace CodeInjection
 {
-	TrampolineGenerator::TrampolineGenerator(CodeAllocator *allocator)
-		: allocator(allocator)
-	{
-	}
-
 	/// <summary>
 	/// Creates a trampoline function for a block of code.
 	/// The trampoline will include all instructions found within a given range of bytes.

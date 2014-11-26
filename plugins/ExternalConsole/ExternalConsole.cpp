@@ -45,13 +45,16 @@ namespace
 
 	std::mutex cmdMutex;
 	std::string cmdString;
+	bool done;
 
-	void inputThread()
+	void inputHandler()
 	{
 		while (true)
 		{
 			std::string str;
 			std::getline(std::cin, str);
+			if (done)
+				break;
 			cmdMutex.lock();
 			cmdString = str;
 			cmdMutex.unlock();
@@ -105,5 +108,15 @@ PLUGINCALLBACK void postEngineInit(PluginInterface *plugin)
 	plugin->onClientProcess(onClientProcess);
 	
 	// Create input-handling thread
-	std::thread(inputThread).detach();
+	std::thread(inputHandler).detach();
+}
+
+PLUGINCALLBACK void engineShutdown(PluginInterface *plugin)
+{
+	done = true;
+#ifdef _WIN32
+	HWND console = GetConsoleWindow();
+	FreeConsole();
+	SendMessage(console, WM_CLOSE, 0, 0);
+#endif
 }
