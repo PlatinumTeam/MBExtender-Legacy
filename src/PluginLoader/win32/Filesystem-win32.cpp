@@ -13,9 +13,7 @@ namespace Filesystem
 		bool exists(const std::string &path)
 		{
 			DWORD attrib = GetFileAttributes(path.c_str());
-			if (attrib == INVALID_FILE_ATTRIBUTES)
-				return false;
-			return ((attrib & FILE_ATTRIBUTE_DIRECTORY) != 0);
+			return (attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_DIRECTORY));
 		}
 
 		/// <summary>
@@ -41,6 +39,20 @@ namespace Filesystem
 			while (FindNextFile(find, &entry));
 			FindClose(find);
 			return true;
+		}
+	}
+
+	namespace File
+	{
+		/// <summary>
+		/// Determines if a file exists.
+		/// </summary>
+		/// <param name="path">The path to the file to check.</param>
+		/// <returns><c>true</c> if the path exists and points to a file.</returns>
+		bool exists(const std::string &path)
+		{
+			DWORD attrib = GetFileAttributes(path.c_str());
+			return (attrib != INVALID_FILE_ATTRIBUTES && !(attrib & FILE_ATTRIBUTE_DIRECTORY));
 		}
 	}
 }

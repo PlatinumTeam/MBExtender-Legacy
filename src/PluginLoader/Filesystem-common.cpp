@@ -29,6 +29,19 @@ namespace Filesystem
 		}
 
 		/// <summary>
+		/// Gets the filename portion of a path.
+		/// </summary>
+		/// <param name="path">The path to get the filename of.</param>
+		/// <returns>The filename portion of the path, or an empty string if none.</returns>
+		std::string getFilename(const std::string &path)
+		{
+			size_t lastSlashPos = path.find_last_of(AllowedSeparators);
+			if (lastSlashPos == std::string::npos)
+				return path;
+			return path.substr(lastSlashPos + 1);
+		}
+
+		/// <summary>
 		/// Gets the filename portion of a path, excluding the extension.</param>
 		/// </summary>
 		/// <param name="path">The path to get the filename of.</param>

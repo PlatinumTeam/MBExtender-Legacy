@@ -16,6 +16,13 @@ namespace Filesystem
 		std::string getExtension(const std::string &path);
 
 		/// <summary>
+		/// Gets the filename portion of a path.
+		/// </summary>
+		/// <param name="path">The path to get the filename of.</param>
+		/// <returns>The filename portion of the path, or an empty string if none.</returns>
+		std::string getFilename(const std::string &path);
+
+		/// <summary>
 		/// Gets the filename portion of a path, excluding the extension.</param>
 		/// </summary>
 		/// <param name="path">The path to get the filename of.</param>
@@ -47,6 +54,16 @@ namespace Filesystem
 		/// <param name="results">The vector to store resulting paths to.</param>
 		/// <returns><c>true</c> if successful.</returns>
 		bool enumerate(const std::string &path, std::vector<std::string> *results);
+	}
+
+	namespace File
+	{
+		/// <summary>
+		/// Determines if a file exists.
+		/// </summary>
+		/// <param name="path">The path to the file to check.</param>
+		/// <returns><c>true</c> if the path exists and points to a file.</returns>
+		bool exists(const std::string &path);
 	}
 }
 

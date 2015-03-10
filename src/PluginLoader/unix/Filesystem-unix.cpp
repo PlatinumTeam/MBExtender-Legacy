@@ -44,4 +44,20 @@ namespace Filesystem
 			return true;
 		}
 	}
+
+	namespace File
+	{
+		/// <summary>
+		/// Determines if a file exists.
+		/// </summary>
+		/// <param name="path">The path to the file to check.</param>
+		/// <returns><c>true</c> if the path exists and points to a file.</returns>
+		bool exists(const std::string &path)
+		{
+			struct stat st;
+			if (stat(path.c_str(), &st))
+				return false;
+			return (S_ISREG(st.st_mode) != 0);
+		}
+	}
 }

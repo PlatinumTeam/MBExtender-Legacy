@@ -67,8 +67,17 @@ namespace
 		}
 		for (auto &path : paths)
 		{
+			// Check if the path points to a shared object file
 			if (Filesystem::Path::getExtension(path) != SharedObject::DefaultExtension)
-				continue;
+			{
+				// Check if the path is a directory, and if so, try to load a shared object file inside it with the same name
+				if (!Filesystem::Directory::exists(path))
+					continue;
+				auto pluginName = Filesystem::Path::getFilename(path);
+				path = Filesystem::Path::combine(path, pluginName + SharedObject::DefaultExtension);
+				if (!Filesystem::File::exists(path))
+					continue;
+			}
 			
 			TGE::Con::printf("   Loading %s", path.c_str());
 			auto library = new SharedObject(path.c_str());
