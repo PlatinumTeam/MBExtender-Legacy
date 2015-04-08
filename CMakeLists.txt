@@ -68,6 +68,15 @@ set (PLUGINLOADER_SRC
 	src/PluginLoader/TrampolineGenerator.cpp
 	src/PluginLoader/Filesystem-common.cpp
 	src/PluginLoader/StringUtil.cpp
+
+	include/PluginLoader/PluginInterface.h
+	src/PluginLoader/BasicPluginInterface.h
+	src/PluginLoader/CodeAllocator.h
+	src/PluginLoader/CodeInjectionStream.h
+	src/PluginLoader/FuncInterceptor.h
+	src/PluginLoader/TrampolineGenerator.h
+	src/PluginLoader/Filesystem.h
+	src/PluginLoader/StringUtil.h
 )
 if (UNIX)
 	set (PLUGINLOADER_SRC ${PLUGINLOADER_SRC}
@@ -92,7 +101,7 @@ if (MSVC)
 endif ()
 
 # TorqueLib
-add_library (TorqueLib SHARED
+set (TORQUELIB_SRC
 	src/TorqueLib/TorqueLib.cpp
 	src/TorqueLib/math/mAngAxis.cpp
 	src/TorqueLib/math/mathUtils.cpp
@@ -112,7 +121,55 @@ add_library (TorqueLib SHARED
 	src/TorqueLib/math/mSolver.cpp
 	src/TorqueLib/math/mSphere.cpp
 	src/TorqueLib/math/util/quadTransforms.cpp
+
+	include/TorqueLib/TGE.h
+	include/TorqueLib/QuickOverride.h
+	include/TorqueLib/platform/platform.h
+	include/TorqueLib/platform/platformAssert.h
+	include/TorqueLib/math/mAngAxis.h
+	include/TorqueLib/math/mathUtils.h
+	include/TorqueLib/math/mBox.h
+	include/TorqueLib/math/mBoxBase.h
+	include/TorqueLib/math/mConstants.h
+	include/TorqueLib/math/mEase.h
+	include/TorqueLib/math/mMath.h
+	include/TorqueLib/math/mMathFn.h
+	include/TorqueLib/math/mMatrix.h
+	include/TorqueLib/math/mOrientedBox.h
+	include/TorqueLib/math/mPlane.h
+	include/TorqueLib/math/mPlaneSet.h
+	include/TorqueLib/math/mPlaneTransformer.h
+	include/TorqueLib/math/mPoint2.h
+	include/TorqueLib/math/mPoint3.h
+	include/TorqueLib/math/mPoint4.h
+	include/TorqueLib/math/mQuat.h
+	include/TorqueLib/math/mRandom.h
+	include/TorqueLib/math/mRandomDeck.h
+	include/TorqueLib/math/mRandomSet.h
+	include/TorqueLib/math/mRect.h
+	include/TorqueLib/math/mSilhouetteExtractor.h
+	include/TorqueLib/math/mSphere.h
+	include/TorqueLib/math/mTransform.h
+	include/TorqueLib/math/util/quadTransforms.h
+	include/TorqueLib/util/tVector.h
 )
+if (WIN32)
+	set (TORQUELIB_SRC ${TORQUELIB_SRC}
+		include/TorqueLib/win32/Addresses-win32.h
+		include/TorqueLib/win32/InterfaceMacros-win32.h
+	)
+elseif (APPLE)
+	set (TORQUELIB_SRC ${TORQUELIB_SRC}
+		include/TorqueLib/osx/Addresses-osx.h
+		include/TorqueLib/win32/InterfaceMacros-linux.h
+	)
+elseif (UNIX)
+	set (TORQUELIB_SRC ${TORQUELIB_SRC}
+		include/TorqueLib/win32/Addresses-linux.h
+		include/TorqueLib/win32/InterfaceMacros-linux.h
+	)
+endif()
+add_library (TorqueLib SHARED ${TORQUELIB_SRC})
 set_property (TARGET TorqueLib APPEND PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/include/TorqueLib/math ${PROJECT_SOURCE_DIR}/include/TorqueLib/math/util)
 
 # TestPlugin
@@ -138,16 +195,27 @@ if (UNIX)
 endif ()
 
 # FrameRateUnlock
-set (FRAMERATEUNLOCK_SRC plugins/FrameRateUnlock/FrameRateUnlock.cpp)
+set (FRAMERATEUNLOCK_SRC
+	plugins/FrameRateUnlock/FrameRateUnlock.cpp
+	plugins/FrameRateUnlock/GameTimer.hpp
+)
 if (WIN32)
 	set (FRAMERATEUNLOCK_SRC ${FRAMERATEUNLOCK_SRC}
 		plugins/FrameRateUnlock/win32/HighPerformanceTimer-win32.cpp
+		plugins/FrameRateUnlock/win32/HighPerformanceTimer-win32.hpp
 		plugins/FrameRateUnlock/win32/MultimediaTimer-win32.cpp
+		plugins/FrameRateUnlock/win32/MultimediaTimer-win32.hpp
 	)
 elseif (APPLE)
-	set (FRAMERATEUNLOCK_SRC ${FRAMERATEUNLOCK_SRC} plugins/FrameRateUnlock/osx/MachTimer-osx.cpp)
+	set (FRAMERATEUNLOCK_SRC ${FRAMERATEUNLOCK_SRC}
+		plugins/FrameRateUnlock/osx/MachTimer-osx.cpp
+		plugins/FrameRateUnlock/osx/MachTimer-osx.hpp
+	)
 elseif (UNIX)
-	set (FRAMERATEUNLOCK_SRC ${FRAMERATEUNLOCK_SRC} plugins/FrameRateUnlock/linux/MonotonicTimer-linux.cpp)
+	set (FRAMERATEUNLOCK_SRC ${FRAMERATEUNLOCK_SRC}
+		plugins/FrameRateUnlock/linux/MonotonicTimer-linux.cpp
+		plugins/FrameRateUnlock/linux/MonotonicTimer-linux.hpp
+	)
 endif ()
 add_library (FrameRateUnlock MODULE ${FRAMERATEUNLOCK_SRC})
 target_link_libraries (FrameRateUnlock TorqueLib)
