@@ -161,12 +161,12 @@ if (WIN32)
 elseif (APPLE)
 	set (TORQUELIB_SRC ${TORQUELIB_SRC}
 		include/TorqueLib/osx/Addresses-osx.h
-		include/TorqueLib/win32/InterfaceMacros-linux.h
+		include/TorqueLib/linux/InterfaceMacros-linux.h
 	)
 elseif (UNIX)
 	set (TORQUELIB_SRC ${TORQUELIB_SRC}
-		include/TorqueLib/win32/Addresses-linux.h
-		include/TorqueLib/win32/InterfaceMacros-linux.h
+		include/TorqueLib/linux/Addresses-linux.h
+		include/TorqueLib/linux/InterfaceMacros-linux.h
 	)
 endif()
 add_library (TorqueLib SHARED ${TORQUELIB_SRC})
