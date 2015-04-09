@@ -4,8 +4,8 @@ project (MBExtender C CXX)
 
 if (UNIX)
 	# Set Unix-specific flags
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -std=c++03 -fvisibility=hidden")
-    enable_language (ASM)
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -std=c++03 -fvisibility=hidden")
+	enable_language (ASM)
 
 	# Force 32 bit
 	# NOTE: This causes issues with Xcode. You still have to explicitly set a 32-bit target.
@@ -19,6 +19,11 @@ elseif (MSVC)
 	cmake_policy (SET CMP0054 NEW) # CMake complains otherwise when we call enable_language
 	enable_language (ASM_MASM)
 	set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO") # SAFESEH needs to be disabled because LDE64 doesn't support it
+	set (CMAKE_GENERATOR_TOOLSET "v120_xp" CACHE STRING "Toolset to compile with") # Force XP (this is kinda hackish, but the CMake GUI doesn't let you specify a toolset yet)
+
+	# Force use of static runtime library
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 endif ()
 
 # Set OS X dylibs to be loaded from the executable directory
@@ -242,7 +247,7 @@ endif ()
 
 # Install rules 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    set (CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/install" CACHE PATH "default install path" FORCE)
+	set (CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/install" CACHE PATH "default install path" FORCE)
 endif()
 install (TARGETS MBExtender DESTINATION bin)
 install (TARGETS PluginLoader RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
