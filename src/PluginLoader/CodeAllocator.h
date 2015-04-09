@@ -23,7 +23,7 @@ namespace CodeInjection
 		/// Allocates a block of code.
 		/// </summary>
 		/// <param name="size">The size of the block to allocate.</param>
-		/// <returns>The allocated block if successful, or <c>nullptr</c> on failure.</returns>
+		/// <returns>The allocated block if successful, or <c>NULL</c> on failure.</returns>
 		void* allocate(size_t size);
 
 	private:

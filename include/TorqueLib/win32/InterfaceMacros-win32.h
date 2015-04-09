@@ -5,7 +5,8 @@
 #define EXPAND(...) __VA_ARGS__
 
 // Macro for quickly declaring a function pointer that points to a static address
-#define FN(rettype, name, args, addr) static const auto name = (rettype (*) args)addr
+#define FN(rettype, name, args, addr) \
+	namespace { rettype (*const name) args = reinterpret_cast<rettype (*) args>(addr); }
 
 // Macros for declaring overloaded function pointers
 //
@@ -49,7 +50,8 @@
 	uint32_t z_vtableLookup_(int index) \
 	{ \
 		return (*reinterpret_cast<uint32_t**>(reinterpret_cast<uint32_t>(this) + offset))[index]; \
-	}
+	} \
+	virtual void z_foo_() = 0
 		
 // Defines a virtual function wrapper
 #define VIRTFN(rettype, name, args, argnames, index) \
@@ -70,50 +72,52 @@
 #define UNDEFVIRT(name) virtual void z_undef_##name##_() = 0
 
 // Defines a "raw" member function pointer
-#define RAWMEMBERFN(clazz, rettype, name, args, addr) static const auto name = (rettype (__thiscall *) (EXPAND(clazz *thisobj, EXPAND args)))addr
+#define RAWMEMBERFN(clazz, rettype, name, args, addr) \
+	namespace { rettype (__thiscall *const name) (EXPAND(clazz *thisobj, EXPAND args)) = reinterpret_cast<rettype (__thiscall *) (EXPAND(clazz *thisobj, EXPAND args))>(addr); }
 
 // Same as RAWMEMBERFN, but defines a "simple" pointer with no arguments
-#define RAWMEMBERFNSIMP(clazz, rettype, name, addr) static const auto name = (rettype (__thiscall *) (clazz *thisobj))addr
+#define RAWMEMBERFNSIMP(clazz, rettype, name, addr) \
+	namespace { rettype (__thiscall *const name) (clazz *thisobj) = reinterpret_cast<rettype (__thiscall *) (clazz *thisobj)>(addr); }
 
 // Defines a wrapper which calls a member function on a class
 // Yes, argument names need to be repeated, but there's not much I can do about that AFAIK
-#define MEMBERFN(rettype, name, args, argnames, addr)                                                       \
-	rettype name args                                                                                       \
-	{                                                                                                       \
-		return ((rettype (__thiscall *) (EXPAND(void*, EXPAND args)))addr) (EXPAND(this, EXPAND argnames)); \
+#define MEMBERFN(rettype, name, args, argnames, addr)                                                                       \
+	rettype name args                                                                                                       \
+	{                                                                                                                       \
+		return reinterpret_cast<rettype (__thiscall *) (EXPAND(void*, EXPAND args))>(addr) (EXPAND(this, EXPAND argnames)); \
 	}
 
 // Same as MEMBERFN, but defines a "simple" wrapper with no arguments
-#define MEMBERFNSIMP(rettype, name, addr)                    \
-	rettype name()                                           \
-	{                                                        \
-		return ((rettype (__thiscall *) (void*))addr)(this); \
+#define MEMBERFNSIMP(rettype, name, addr)                                     \
+	rettype name()                                                            \
+	{                                                                         \
+		return reinterpret_cast<rettype (__thiscall *) (void*)>(addr) (this); \
 	}
 	
 // Defines a destructor wrapper
-#define MEMBERDTOR(name, addr)                     \
-	name()                                         \
-	{                                              \
-		((void (__thiscall *) (void*))addr)(this); \
+#define MEMBERDTOR(name, addr)                                      \
+	name()                                                          \
+	{                                                               \
+		reinterpret_cast<void (__thiscall *) (void*)>(addr) (this); \
 	}
 
 // Defines a global variable
-#define GLOBALVAR(type, name, addr) static type &name = *(type*)addr
+#define GLOBALVAR(type, name, addr) namespace { type &name = *reinterpret_cast<type*>(addr); }
 
 // Defines a function which uses the thiscall convention
-#define THISFN(rettype, name, args)                                       \
-	rettype __fastcall z_thisfn_impl_##name (EXPAND(void*, EXPAND args)); \
-	namespace                                                             \
-	{                                                                     \
-		__declspec(naked) void z_thisfn_jmp_##name args                   \
-		{                                                                 \
-			__asm mov edx, ecx                                            \
-			__asm xor ecx, ecx                                            \
-			__asm jmp z_thisfn_impl_##name                                \
-		}                                                                 \
-	}                                                                     \
-	typedef rettype (__thiscall* z_thisfn_ptr_##name) args; \
-	const z_thisfn_ptr_##name name = (z_thisfn_ptr_##name) z_thisfn_jmp_##name;  \
+#define THISFN(rettype, name, args)                                                               \
+	rettype __fastcall z_thisfn_impl_##name (EXPAND(void*, EXPAND args));                         \
+	namespace                                                                                     \
+	{                                                                                             \
+		__declspec(naked) void z_thisfn_jmp_##name args                                           \
+		{                                                                                         \
+			__asm mov edx, ecx                                                                    \
+			__asm xor ecx, ecx                                                                    \
+			__asm jmp z_thisfn_impl_##name                                                        \
+		}                                                                                         \
+	}                                                                                             \
+	typedef rettype (__thiscall* z_thisfn_ptr_##name) args;                                       \
+	const z_thisfn_ptr_##name name = reinterpret_cast<z_thisfn_ptr_##name>(z_thisfn_jmp_##name);  \
 	rettype __fastcall z_thisfn_impl_##name (EXPAND(void*, EXPAND args))
 
 // Defines a getter for a class field
@@ -127,10 +131,10 @@
 #define GETTERFNSIMP(type, name, offset) GETTERFN(type, type, name, offset)
 
 // Defines a setter for a class field
-#define SETTERFN(type, name, offset)                                                 \
-	void name(type newValue)                                                         \
-	{                                                                                \
-		*reinterpret_cast<type*>(reinterpret_cast<char*>(this) + offset) = newValue; \
+#define SETTERFN(type, name, offset)                                                    \
+	void name(type newValue)                                                            \
+	{                                                                                   \
+		*reinterpret_cast<type*>(reinterpret_cast<uint32_t>(this) + offset) = newValue; \
 	}
 
 #endif // TORQUELIB_INTERFACEMACROS_WIN32_H

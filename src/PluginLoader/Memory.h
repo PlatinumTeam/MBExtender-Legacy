@@ -9,7 +9,7 @@ namespace Memory
 	/// </summary>
 	/// <param name="minSize">The minimum amount of data to allocate.</param>
 	/// <param name="actualSize">Variable to store the actual allocated size to.</param>
-	/// <returns>The pointer to the allocated data if successful, or <c>nullptr</c> otherwise.</returns>
+	/// <returns>The pointer to the allocated data if successful, or <c>NULL</c> otherwise.</returns>
 	void *allocateCode(size_t minSize, size_t *actualSize);
 	
 	/// <summary>

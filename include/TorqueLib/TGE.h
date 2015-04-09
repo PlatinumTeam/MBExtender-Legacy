@@ -720,12 +720,72 @@ namespace TGE
 
 namespace TGE
 {
+	/*OVERLOAD_PTR {
+			OVERLOAD_FN(void, (const char *name, StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs),                     TGEADDR_CON_ADDCOMMAND_5_STRING);
+			OVERLOAD_FN(void, (const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs),                       TGEADDR_CON_ADDCOMMAND_5_VOID);
+			OVERLOAD_FN(void, (const char *name, IntCallback cb, const char *usage, S32 minArgs, S32 maxArgs),                        TGEADDR_CON_ADDCOMMAND_5_INT);
+			OVERLOAD_FN(void, (const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs),                      TGEADDR_CON_ADDCOMMAND_5_FLOAT);
+			OVERLOAD_FN(void, (const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs),                       TGEADDR_CON_ADDCOMMAND_5_BOOL);
+			OVERLOAD_FN(void, (const char *nsName, const char *name, StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs), TGEADDR_CON_ADDCOMMAND_6_STRING);
+			OVERLOAD_FN(void, (const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs),   TGEADDR_CON_ADDCOMMAND_6_VOID);
+			OVERLOAD_FN(void, (const char *nsName, const char *name, IntCallback cb, const char *usage, S32 minArgs, S32 maxArgs),    TGEADDR_CON_ADDCOMMAND_6_INT);
+			OVERLOAD_FN(void, (const char *nsName, const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs),  TGEADDR_CON_ADDCOMMAND_6_FLOAT);
+			OVERLOAD_FN(void, (const char *nsName, const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs),   TGEADDR_CON_ADDCOMMAND_6_BOOL);
+		} addCommand;*/
+
 	// Psuedo class used to implement the ConsoleFunction macro.
 	class _ConsoleConstructor
 	{
 	public:
-		template<typename... Args>
-		_ConsoleConstructor(Args... args) { Con::addCommand(args...); }
+		_ConsoleConstructor(const char *name, StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs)
+		{
+			Con::addCommand(name, cb, usage, minArgs, maxArgs);
+		}
+
+		_ConsoleConstructor(const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs)
+		{
+			Con::addCommand(name, cb, usage, minArgs, maxArgs);
+		}
+
+		_ConsoleConstructor(const char *name, IntCallback cb, const char *usage, S32 minArgs, S32 maxArgs)
+		{
+			Con::addCommand(name, cb, usage, minArgs, maxArgs);
+		}
+
+		_ConsoleConstructor(const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs)
+		{
+			Con::addCommand(name, cb, usage, minArgs, maxArgs);
+		}
+
+		_ConsoleConstructor(const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs)
+		{
+			Con::addCommand(name, cb, usage, minArgs, maxArgs);
+		}
+
+		_ConsoleConstructor(const char *nsName, const char *name, StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs)
+		{
+			Con::addCommand(nsName, name, cb, usage, minArgs, maxArgs);
+		}
+
+		_ConsoleConstructor(const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs)
+		{
+			Con::addCommand(nsName, name, cb, usage, minArgs, maxArgs);
+		}
+
+		_ConsoleConstructor(const char *nsName, const char *name, IntCallback cb, const char *usage, S32 minArgs, S32 maxArgs)
+		{
+			Con::addCommand(nsName, name, cb, usage, minArgs, maxArgs);
+		}
+
+		_ConsoleConstructor(const char *nsName, const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs)
+		{
+			Con::addCommand(nsName, name, cb, usage, minArgs, maxArgs);
+		}
+
+		_ConsoleConstructor(const char *nsName, const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs)
+		{
+			Con::addCommand(nsName, name, cb, usage, minArgs, maxArgs);
+		}
 	};
 }
 

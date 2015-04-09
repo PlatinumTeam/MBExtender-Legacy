@@ -3,7 +3,7 @@
 #include <vector>
 #include "BasicPluginInterface.h"
 
-std::vector<PluginInterface::clientProcess_ptr>* processList;
+std::vector<PluginInterface::clientProcess_ptr> *processList;
 
 void BasicTorqueFunctionInterceptor::restore(void *func)
 {
@@ -26,7 +26,7 @@ void BasicPluginInterface::executeProcessList(uint32_t timeDelta)
 {
 	if (!processList)
 		return;
-	auto size = processList->size();
-	for (decltype(size) i = 0; i < size; i++)
+	size_t size = processList->size();
+	for (size_t i = 0; i < size; i++)
 		(*processList)[i](timeDelta);
 }

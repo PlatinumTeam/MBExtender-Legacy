@@ -31,7 +31,7 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved ) {
 	if ( fdwReason == DLL_PROCESS_ATTACH ) {
 		mHinstDLL = LoadLibrary( REAL_DLL_NAME );
 		if ( !mHinstDLL ) {
-			MessageBox( nullptr, "Unable to load " REAL_DLL_NAME ".\r\nMake sure the file exists and then try again.", "MBExtender", MB_OK | MB_ICONERROR );
+			MessageBox( NULL, "Unable to load " REAL_DLL_NAME ".\r\nMake sure the file exists and then try again.", "MBExtender", MB_OK | MB_ICONERROR );
 			return ( FALSE );
 		}
 		for ( int i = 0; i < 35; i++ )

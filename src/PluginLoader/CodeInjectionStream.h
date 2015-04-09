@@ -44,13 +44,13 @@ namespace CodeInjection
 		/// <summary>
 		/// Reads a relative 32-bit jump or call instruction from the stream at the current position, advancing the stream by the size of the instruction.
 		/// </summary>
-		/// <returns>The target of the far jump or call if valid, or <c>nullptr</c> otherwise.</returns>
+		/// <returns>The target of the far jump or call if valid, or <c>NULL</c> otherwise.</returns>
 		void* readRel32Jump();
 
 		/// <summary>
 		/// Reads a relative 32-bit jump or call instruction from the stream at the current position without advancing the stream position.
 		/// </summary>
-		/// <returns>The target of the far jump or call if valid, or <c>nullptr</c> otherwise.</returns>
+		/// <returns>The target of the far jump or call if valid, or <c>NULL</c> otherwise.</returns>
 		void* peekRel32Jump() const;
 
 		/// <summary>

@@ -17,5 +17,5 @@ bool injectPluginLoader()
 		MessageBox(NULL, "Unable to locate initPluginLoader in PluginLoader.dll.\r\nVerify that the file is not corrupt and then try again.", "MBExtender", MB_OK | MB_ICONERROR);
 		return false;
 	}
-	return (initPluginLoader(nullptr) != 0);
+	return (initPluginLoader(NULL) != 0);
 }

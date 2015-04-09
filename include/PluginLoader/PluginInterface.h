@@ -32,7 +32,7 @@ public:
 	/// </summary>
 	/// <param name="func">The function to intercept calls to.</param>
 	/// <param name="newFunc">The function to redirect callers to.</param>
-	/// <returns>A function pointer which can be used to call the original function, or <c>nullptr</c> on failure.</returns>
+	/// <returns>A function pointer which can be used to call the original function, or <c>NULL</c> on failure.</returns>
 	template<class T>
 	T intercept(T func, T newFunc)
 	{
@@ -51,7 +51,7 @@ protected:
 	/// </summary>
 	/// <param name="func">The function to intercept calls to.</param>
 	/// <param name="newFunc">The function to redirect callers to.</param>
-	/// <returns>A function pointer which can be used to call the original function, or <c>nullptr</c> on failure.</returns>
+	/// <returns>A function pointer which can be used to call the original function, or <c>NULL</c> on failure.</returns>
 	virtual void* intercept(void *func, void *newFunc) = 0;
 };
 

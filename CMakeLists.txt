@@ -4,7 +4,7 @@ project (MBExtender C CXX)
 
 if (UNIX)
 	# Set Unix-specific flags
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -std=c++11 -fvisibility=hidden")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -std=c++03 -fvisibility=hidden")
     enable_language (ASM)
 
 	# Force 32 bit

@@ -23,29 +23,29 @@ namespace CodeInjection
 	/// </summary>
 	/// <param name="func">The function to intercept.</param>
 	/// <param name="newFunc">The new function to redirect callers to.</param>
-	/// <returns>A pointer which can be used to call the original function, or <c>nullptr</c> on failure.</returns>
+	/// <returns>A pointer which can be used to call the original function, or <c>NULL</c> on failure.</returns>
 	void *FuncInterceptor::interceptImpl(void *func, void *newFunc)
 	{
-		if (stream == nullptr || func == nullptr || newFunc == nullptr)
-			return nullptr;
+		if (stream == NULL || func == NULL || newFunc == NULL)
+			return NULL;
 
 		// As an optimization, if the function is a thunk (it only does a relative jump),
 		// then a trampoline isn't necessary
 		stream->seekTo(func);
 		void *originalFunc = stream->peekRel32Jump();
-		if (originalFunc == nullptr)
+		if (originalFunc == NULL)
 		{
 			// Check if it creates and destroys a stack frame first before jumping
 			uint8_t thunkTest[sizeof(ThunkCode)];
 			if (stream->read(thunkTest, sizeof(thunkTest)) && memcmp(thunkTest, ThunkCode, sizeof(thunkTest)) == 0)
 				originalFunc = stream->peekRel32Jump();
 		}
-		if (originalFunc == nullptr)
+		if (originalFunc == NULL)
 		{
 			// Not a thunk - create a trampoline
 			originalFunc = trampolineGen.createTrampoline(func, JumpSize);
-			if (originalFunc == nullptr)
-				return nullptr;
+			if (originalFunc == NULL)
+				return NULL;
 		}
 		
 		// Write a jump to the new function and store the original function pointer
@@ -62,7 +62,7 @@ namespace CodeInjection
 	/// <param name="oldFunc">The old code pointer.</param>
 	void FuncInterceptor::restore(void *func, void *oldFunc)
 	{
-		if (stream == nullptr)
+		if (stream == NULL)
 			return;
 		stream->seekTo(func);
 		stream->writeRel32Jump(oldFunc);
@@ -74,9 +74,9 @@ namespace CodeInjection
 	/// <param name="func">The function to restore.</param>
 	void FuncInterceptor::restore(void *func)
 	{
-		if (stream == nullptr)
+		if (stream == NULL)
 			return;
-		auto it = originalFunctions.find(func);
+		std::unordered_map<void*, void*>::iterator it = originalFunctions.find(func);
 		if (it == originalFunctions.end())
 			return;
 		restore(func, it->second);
@@ -88,8 +88,8 @@ namespace CodeInjection
 	/// </summary>
 	void FuncInterceptor::restoreAll()
 	{
-		for (auto func : originalFunctions)
-			restore(func.first, func.second);
+		for (std::unordered_map<void*, void*>::iterator it = originalFunctions.begin(); it != originalFunctions.end(); ++it)
+			restore(it->first, it->second);
 		originalFunctions.clear();
 	}
 }

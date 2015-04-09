@@ -5,7 +5,8 @@
 #define EXPAND(...) __VA_ARGS__
 
 // Macro for quickly declaring a function pointer that points to a static address
-#define FN(rettype, name, args, addr) namespace { rettype (*const name)args = (rettype (*) args)addr; }
+#define FN(rettype, name, args, addr) \
+	namespace { rettype (*const name) args = reinterpret_cast<rettype (*) args>(addr); }
 
 // fastcall calling convention
 #ifndef __fastcall
@@ -17,7 +18,8 @@
 #endif
 
 // Macro for declaring a function pointer which uses the fastcall convention
-#define FASTCALLFN(rettype, name, args, addr) namespace { rettype (__fastcall *const name)args = (rettype (__fastcall *) args)addr; }
+#define FASTCALLFN(rettype, name, args, addr) \
+	namespace { rettype (__fastcall *const name) args = reinterpret_cast<rettype (__fastcall *) args>(addr); }
 
 // Macros for declaring overloaded function pointers
 //
@@ -34,14 +36,14 @@
 	public:                                             \
 		inline operator t_##addr##_ () const            \
 		{                                               \
-			return (t_##addr##_)(addr); \
+			return reinterpret_cast<t_##addr##_>(addr); \
 		}
 	
 // Defines the offset of a class's vtable pointer. Required in order to use VIRTFN and VIRTFNSIMP.	
 #define VTABLE(offset) \
 	uint32_t z_vtableLookup_(int index) \
 	{ \
-		return (*(uint32_t**)((char*)(this) + offset))[index]; \
+		return (*reinterpret_cast<uint32_t**>(reinterpret_cast<uint32_t>(this) + offset))[index]; \
 	} \
 	virtual void z_foo_() = 0
 		
@@ -64,35 +66,37 @@
 #define UNDEFVIRT(name)
 	
 // Defines a "raw" member function pointer
-#define RAWMEMBERFN(clazz, rettype, name, args, addr) namespace { const auto name = (rettype (*) (EXPAND(clazz *thisobj, EXPAND args)))addr; }
+#define RAWMEMBERFN(clazz, rettype, name, args, addr) \
+	namespace { rettype (*const name) (EXPAND(clazz *thisobj, EXPAND args)) = reinterpret_cast<rettype (*) (EXPAND(clazz *thisobj, EXPAND args))>(addr); }
 
 // Same as RAWMEMBERFN, but defines a "simple" pointer with no arguments
-#define RAWMEMBERFNSIMP(clazz, rettype, name, addr) namespace { const auto name = (rettype (*) (clazz *thisobj))addr; }
+#define RAWMEMBERFNSIMP(clazz, rettype, name, addr) \
+	namespace { rettype (*const name) (clazz *thisobj) = reinterpret_cast<rettype (*) (clazz *thisobj)>(addr); }
 
 // Defines a wrapper which calls a member function on a class
 // Yes, argument names need to be repeated, but there's not much I can do about that AFAIK
-#define MEMBERFN(rettype, name, args, argnames, addr)                                              \
-	rettype name args                                                                              \
-	{                                                                                              \
-		return ((rettype (*) (EXPAND(void*, EXPAND args)))(size_t)(addr)) (EXPAND(this, EXPAND argnames)); \
+#define MEMBERFN(rettype, name, args, argnames, addr)                                                            \
+	rettype name args                                                                                            \
+	{                                                                                                            \
+		return reinterpret_cast<rettype (*) (EXPAND(void*, EXPAND args))>(addr) (EXPAND(this, EXPAND argnames)); \
 	}
 
 // Same as MEMBERFN, but defines a "simple" wrapper with no arguments
-#define MEMBERFNSIMP(rettype, name, addr)           \
-	rettype name()                                  \
-	{                                               \
-		return ((rettype (*) (void*))(size_t)(addr))(this); \
+#define MEMBERFNSIMP(rettype, name, addr)                          \
+	rettype name()                                                 \
+	{                                                              \
+		return reinterpret_cast<rettype (*) (void*)>(addr) (this); \
 	}
 	
 // Defines a destructor wrapper
-#define MEMBERDTOR(name, addr)            \
-	name()                                \
-	{                                     \
-		((void (*) (void*))(size_t)(addr))(this); \
+#define MEMBERDTOR(name, addr)                           \
+	name()                                               \
+	{                                                    \
+		reinterpret_cast<void (*) (void*)>(addr) (this); \
 	}
 
 // Defines a global variable
-#define GLOBALVAR(type, name, addr) namespace { type &name = *(type*)addr; }
+#define GLOBALVAR(type, name, addr) namespace { type &name = *reinterpret_cast<type*>(addr); }
 
 // Defines a function which uses the thiscall convention
 #define THISFN(rettype, name, args) \
@@ -102,7 +106,7 @@
 #define GETTERFN(rettype, internaltype, name, offset)                                    \
 	rettype name()                                                                       \
 	{                                                                                    \
-		return *(internaltype*)((char*)(this) + offset); \
+		return *reinterpret_cast<internaltype*>((char*)(this) + offset); \
 	}
 
 // Defines a getter for a class field where the return type and internal type are the same
@@ -112,7 +116,7 @@
 #define SETTERFN(type, name, offset)                                                 \
 	void name(type newValue)                                                         \
 	{                                                                                \
-		*(type*)((char*)(this) + offset) = newValue; \
+		*reinterpret_cast<type*>(reinterpret_cast<char*>(this) + offset) = newValue; \
 	}
 
 #endif // TORQUELIB_INTERFACEMACROS_LINUX_H

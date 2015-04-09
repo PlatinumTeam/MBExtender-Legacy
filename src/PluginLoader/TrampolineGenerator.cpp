@@ -15,7 +15,7 @@ namespace CodeInjection
 	/// </summary>
 	/// <param name="src">The start of the block of code to create a trampoline for.</param>
 	/// <param name="minSize">The number of bytes to copy instructions within.</param>
-	/// <returns>A pointer to the generated trampoline function, or <c>nullptr</c> on failure.</returns>
+	/// <returns>A pointer to the generated trampoline function, or <c>NULL</c> on failure.</returns>
 	void* TrampolineGenerator::createTrampoline(void *src, size_t minSize)
 	{
 		// Need to allocate space for overwritten instructions + a jump
@@ -24,8 +24,8 @@ namespace CodeInjection
 
 		// Allocate code for the trampoline
 		void *trampoline = allocator->allocate(trampolineSize);
-		if (trampoline == nullptr)
-			return nullptr;
+		if (trampoline == NULL)
+			return NULL;
 
 		// Copy overwritten instructions from the source function to the trampoline
 		CodeInjectionStream stream(trampoline, trampolineSize);

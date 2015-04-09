@@ -65,27 +65,29 @@ namespace
 			TGE::Con::warnf("   Unable to enumerate the %s directory!", pluginDir.c_str());
 			return;
 		}
-		for (auto &path : paths)
+		for (size_t i = 0; i < paths.size(); i++)
 		{
+			std::string &path = paths[i];
+
 			// Check if the path points to a shared object file
 			if (Filesystem::Path::getExtension(path) != SharedObject::DefaultExtension)
 			{
 				// Check if the path is a directory, and if so, try to load a shared object file inside it with the same name
 				if (!Filesystem::Directory::exists(path))
 					continue;
-				auto pluginName = Filesystem::Path::getFilename(path);
+				std::string pluginName = Filesystem::Path::getFilename(path);
 				path = Filesystem::Path::combine(path, pluginName + SharedObject::DefaultExtension);
 				if (!Filesystem::File::exists(path))
 					continue;
 			}
 			
 			TGE::Con::printf("   Loading %s", path.c_str());
-			auto library = new SharedObject(path.c_str());
+			SharedObject *library = new SharedObject(path.c_str());
 			if (library->loaded())
 			{
-				auto interceptor = new CodeInjection::FuncInterceptor(injectionStream, codeAlloc);
-				auto torqueInterceptor = new BasicTorqueFunctionInterceptor(interceptor);
-				auto pluginInterface = new BasicPluginInterface(torqueInterceptor, path);
+				CodeInjection::FuncInterceptor *interceptor = new CodeInjection::FuncInterceptor(injectionStream, codeAlloc);
+				BasicTorqueFunctionInterceptor *torqueInterceptor = new BasicTorqueFunctionInterceptor(interceptor);
+				BasicPluginInterface *pluginInterface = new BasicPluginInterface(torqueInterceptor, path);
 				LoadedPlugin info = { path, library, interceptor, torqueInterceptor, pluginInterface };
 				loadedPlugins->push_back(info);
 				if (installUserOverrides)
@@ -101,7 +103,7 @@ namespace
 
 	bool runPluginCallback(const LoadedPlugin *plugin, const char *fnName)
 	{
-		auto func = reinterpret_cast<pluginCallback_t>(plugin->library->getSymbol(fnName));
+		pluginCallback_t func = reinterpret_cast<pluginCallback_t>(plugin->library->getSymbol(fnName));
 		if (!func)
 			return false;
 		func(plugin->pluginInterface);
@@ -113,8 +115,9 @@ namespace
 		if (loadedPlugins->size() == 0)
 			return;
 		TGE::Con::printf("%s", message);
-		for (auto &plugin : *loadedPlugins)
+		for (size_t i = 0; i < loadedPlugins->size(); i++)
 		{
+			LoadedPlugin &plugin = (*loadedPlugins)[i];
 			TGE::Con::printf("   Initializing %s", plugin.path.c_str());
 			if (!runPluginCallback(&plugin, fnName))
 				TGE::Con::warnf("   WARNING: %s does not have a %s() function!", plugin.path.c_str(), fnName);
@@ -140,17 +143,18 @@ namespace
 		delete plugin->torqueInterceptor;
 		delete plugin->interceptor;
 		delete plugin->library;
-		plugin->pluginInterface = nullptr;
-		plugin->torqueInterceptor = nullptr;
-		plugin->interceptor = nullptr;
-		plugin->library = nullptr;
+		plugin->pluginInterface = NULL;
+		plugin->torqueInterceptor = NULL;
+		plugin->interceptor = NULL;
+		plugin->library = NULL;
 	}
 
 	void unloadPlugins()
 	{
 		TGE::Con::printf("MBExtender: Unloading Plugins:");
-		for (auto &plugin : *loadedPlugins)
+		for (size_t i = 0; i < loadedPlugins->size(); i++)
 		{
+			LoadedPlugin &plugin = (*loadedPlugins)[i];
 			TGE::Con::printf("   Unloading %s", plugin.path.c_str());
 			unloadPlugin(&plugin);
 		}
@@ -159,8 +163,10 @@ namespace
 
 	void setPluginVariables()
 	{
-		for (auto &plugin : *loadedPlugins)
+		for (size_t i = 0; i < loadedPlugins->size(); i++)
 		{
+			LoadedPlugin &plugin = (*loadedPlugins)[i];
+
 			// Set the Plugin::Loaded variable corresponding to the plugin
 			std::string varName = Filesystem::Path::getFilenameWithoutExtension(plugin.path);
 			varName = "Plugin::Loaded" + varName;
@@ -174,7 +180,7 @@ namespace
 		mathLib = new SharedObject(TorqueLibPath);
 		if (mathLib->loaded())
 		{
-			auto initFunc = reinterpret_cast<initMath_t>(mathLib->getSymbol("init"));
+			initMath_t initFunc = reinterpret_cast<initMath_t>(mathLib->getSymbol("init"));
 			if (initFunc)
 				initFunc();
 			else
@@ -188,7 +194,7 @@ namespace
 		{
 			TGE::Con::errorf("   Unable to load %s! Some plugins may fail to load!", TorqueLibPath);
 			delete mathLib;
-			mathLib = nullptr;
+			mathLib = NULL;
 		}
 	}
 
@@ -196,7 +202,7 @@ namespace
 	bool tsUnloadPlugin(TGE::SimObject *obj, S32 argc, const char *argv[])
 	{
 		std::string upperName = strToUpper(argv[1]);
-		for (auto it = loadedPlugins->begin(); it != loadedPlugins->end(); ++it)
+		for (std::vector<LoadedPlugin>::iterator it = loadedPlugins->begin(); it != loadedPlugins->end(); ++it)
 		{
 			LoadedPlugin *plugin = &*it;
 			if (strToUpper(Filesystem::Path::getFilenameWithoutExtension(plugin->path)) == upperName)
@@ -215,7 +221,7 @@ namespace
 		TGE::Con::addCommand("unloadPlugin", tsUnloadPlugin, "unloadPlugin(name)", 2, 2);
 	}
 
-	auto originalNsInit = TGE::Namespace::init;
+	void (*originalNsInit)() = TGE::Namespace::init;
 	void newNsInit()
 	{
 		originalNsInit();
@@ -227,7 +233,7 @@ namespace
 		pluginPreInit();
 	}
 
-	auto originalParticleInit = TGE::ParticleEngine::init;
+	void (*originalParticleInit)() = TGE::ParticleEngine::init;
 	void newParticleInit()
 	{
 		originalParticleInit();
@@ -237,7 +243,7 @@ namespace
 		setPluginVariables();
 	}
 
-	auto originalShutdownGame = TGE::shutdownGame;
+	void (*originalShutdownGame)() = TGE::shutdownGame;
 	void newShutdownGame()
 	{
 		originalShutdownGame();
@@ -245,7 +251,7 @@ namespace
 	}
 
 	// Handles onClientProcess() callbacks
-	auto originalClientProcess = TGE::clientProcess;
+	void (*originalClientProcess)(U32) = TGE::clientProcess;
 	void newClientProcess(U32 timeDelta)
 	{
 		BasicPluginInterface::executeProcessList(timeDelta);

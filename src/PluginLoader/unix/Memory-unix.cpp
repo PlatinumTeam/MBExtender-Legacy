@@ -11,18 +11,18 @@ namespace Memory
 	/// </summary>
 	/// <param name="minSize">The minimum amount of data to allocate.</param>
 	/// <param name="actualSize">Variable to store the actual allocated size to.</param>
-	/// <returns>The pointer to the allocated data if successful, or <c>nullptr</c> otherwise.</returns>
+	/// <returns>The pointer to the allocated data if successful, or <c>NULL</c> otherwise.</returns>
 	void *allocateCode(size_t minSize, size_t *actualSize)
 	{
 		long pageSize = sysconf(_SC_PAGESIZE);
 		size_t size = (minSize + pageSize - 1) & ~(pageSize - 1); // Round minSize up to a multiple of pageSize
-		void *buffer = mmap(nullptr, size, PROT_EXEC | PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+		void *buffer = mmap(NULL, size, PROT_EXEC | PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 		if (buffer != MAP_FAILED)
 		{
 			*actualSize = size;
 			return buffer;
 		}
-		return nullptr;
+		return NULL;
 	}
 	
 	/// <summary>
@@ -91,7 +91,7 @@ namespace Memory
 		}
 		else
 		{
-			auto it = protection->find(alignedCode);
+			std::unordered_map<void*, int>::const_iterator it = protection->find(alignedCode);
 			if (it != protection->end())
 				*oldProtection = it->second;
 			else

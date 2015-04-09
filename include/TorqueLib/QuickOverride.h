@@ -39,15 +39,17 @@ namespace TorqueLib
 #define MAKEUNIQUE(x) TOKENPASTE2(x, __LINE__)
 
 #define TorqueOverride(rettype, func, args, originalName) \
-	static rettype MAKEUNIQUE(z_torqueOverride) args;\
-	static auto originalName = TGE:: func;\
-	static TorqueLib::OverrideGenerator<decltype(originalName)> MAKEUNIQUE(z_torqueOverrideGen) (&originalName, MAKEUNIQUE(z_torqueOverride));\
+	typedef rettype (* MAKEUNIQUE(z_torqueOverride_ptr)) args; \
+	static rettype MAKEUNIQUE(z_torqueOverride) args; \
+	static MAKEUNIQUE(z_torqueOverride_ptr) originalName = TGE:: func; \
+	static TorqueLib::OverrideGenerator<MAKEUNIQUE(z_torqueOverride_ptr)> MAKEUNIQUE(z_torqueOverrideGen) (&originalName, MAKEUNIQUE(z_torqueOverride)); \
 	static rettype MAKEUNIQUE(z_torqueOverride) args
 
 #define TorqueOverrideFastcall(rettype, func, args, originalName) \
-	static __fastcall rettype MAKEUNIQUE(z_torqueOverride) args;\
-	static auto originalName = TGE:: func;\
-	static TorqueLib::OverrideGenerator<decltype(originalName)> MAKEUNIQUE(z_torqueOverrideGen) (&originalName, MAKEUNIQUE(z_torqueOverride));\
+	typedef rettype (__fastcall* MAKEUNIQUE(z_torqueOverride_ptr)) args; \
+	static __fastcall rettype MAKEUNIQUE(z_torqueOverride) args; \
+	static MAKEUNIQUE(z_torqueOverride_ptr) originalName = TGE:: func; \
+	static TorqueLib::OverrideGenerator<MAKEUNIQUE(z_torqueOverride_ptr)> MAKEUNIQUE(z_torqueOverrideGen) (&originalName, MAKEUNIQUE(z_torqueOverride)); \
 	static rettype MAKEUNIQUE(z_torqueOverride) args
 
 #define THISFN2(rettype, name, args) THISFN(rettype, name, args)
@@ -56,15 +58,15 @@ namespace TorqueLib
 #define TorqueOverrideMember(rettype, func, args, originalName) \
 	typedef rettype (__thiscall* MAKEUNIQUE(z_torqueOverride_ptr)) args; \
 	extern const MAKEUNIQUE(z_torqueOverride_ptr) MAKEUNIQUE(z_torqueOverride); \
-	static auto originalName = TGE::Members:: func;\
-	static TorqueLib::OverrideGenerator<MAKEUNIQUE(z_torqueOverride_ptr)> MAKEUNIQUE(z_torqueOverrideGen) (&originalName, MAKEUNIQUE(z_torqueOverride));\
+	static MAKEUNIQUE(z_torqueOverride_ptr) originalName = TGE::Members:: func; \
+	static TorqueLib::OverrideGenerator<MAKEUNIQUE(z_torqueOverride_ptr)> MAKEUNIQUE(z_torqueOverrideGen) (&originalName, MAKEUNIQUE(z_torqueOverride)); \
 	THISFN2(rettype, MAKEUNIQUE(z_torqueOverride), args)
 #else
 #define TorqueOverrideMember(rettype, func, args, originalName) \
 	typedef rettype (* MAKEUNIQUE(z_torqueOverride_ptr)) args; \
 	rettype MAKEUNIQUE(z_torqueOverride) args; \
-	static auto originalName = TGE::Members:: func;\
-	static TorqueLib::OverrideGenerator<MAKEUNIQUE(z_torqueOverride_ptr)> MAKEUNIQUE(z_torqueOverrideGen) (&originalName, MAKEUNIQUE(z_torqueOverride));\
+	static MAKEUNIQUE(z_torqueOverride_ptr) originalName = TGE::Members:: func; \
+	static TorqueLib::OverrideGenerator<MAKEUNIQUE(z_torqueOverride_ptr)> MAKEUNIQUE(z_torqueOverrideGen) (&originalName, MAKEUNIQUE(z_torqueOverride)); \
 	THISFN2(rettype, MAKEUNIQUE(z_torqueOverride), args)
 #endif // _WIN32
 

@@ -56,11 +56,11 @@ namespace CodeInjection
 	/// <summary>
 	/// Reads a relative 32-bit jump or call instruction from the stream at the current position, advancing the stream by the size of the instruction.
 	/// </summary>
-	/// <returns>The target of the far jump or call if valid, or <c>nullptr</c> otherwise.</returns>
+	/// <returns>The target of the far jump or call if valid, or <c>NULL</c> otherwise.</returns>
 	void* CodeInjectionStream::readRel32Jump()
 	{
-		auto result = peekRel32Jump();
-		if (result != nullptr)
+		void *result = peekRel32Jump();
+		if (result != NULL)
 			skip(Rel32JumpSize);
 		return result;
 	}
@@ -68,19 +68,19 @@ namespace CodeInjection
 	/// <summary>
 	/// Reads a relative 32-bit jump or call instruction from the stream at the current position without advancing the stream position.
 	/// </summary>
-	/// <returns>The target of the far jump or call if valid, or <c>nullptr</c> otherwise.</returns>
+	/// <returns>The target of the far jump or call if valid, or <c>NULL</c> otherwise.</returns>
 	void* CodeInjectionStream::peekRel32Jump() const
 	{
 		if (!isSpaceAvailable(Rel32JumpSize))
-			return nullptr;
+			return NULL;
 
 		// Make sure this is actually a rel32 JMP or CALL instruction
-		auto jumpOpcode = *currentPtr;
+		uint8_t jumpOpcode = *currentPtr;
 		if (jumpOpcode != Rel32JumpOpcode && jumpOpcode != Rel32CallOpcode)
-			return nullptr;
+			return NULL;
 
 		// target = offset + address of next instruction
-		auto jumpOffset = *reinterpret_cast<int32_t*>(currentPtr + 1);
+		int32_t jumpOffset = *reinterpret_cast<int32_t*>(currentPtr + 1);
 		return currentPtr + Rel32JumpSize + jumpOffset;
 	}
 
@@ -133,7 +133,7 @@ namespace CodeInjection
 		if (!isSpaceAvailable(count))
 			return;
 
-		for (auto i = 0; i < count; i++)
+		for (int i = 0; i < count; i++)
 			currentPtr[i] = NopOpcode;
 
 		currentPtr += count;

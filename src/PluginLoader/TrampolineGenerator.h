@@ -22,7 +22,7 @@ namespace CodeInjection
 		/// </summary>
 		/// <param name="src">The start of the block of code to create a trampoline for.</param>
 		/// <param name="minSize">The number of bytes to copy instructions within.</param>
-		/// <returns>A pointer to the generated trampoline function, or <c>nullptr</c> on failure.</returns>
+		/// <returns>A pointer to the generated trampoline function, or <c>NULL</c> on failure.</returns>
 		void* createTrampoline(void *src, size_t minSize);
 
 	private:

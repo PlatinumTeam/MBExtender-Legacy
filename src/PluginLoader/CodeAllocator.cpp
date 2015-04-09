@@ -4,7 +4,7 @@
 namespace CodeInjection
 {
 	CodeAllocator::CodeAllocator()
-		: ptr(nullptr), sizeRemaining(0)
+		: ptr(NULL), sizeRemaining(0)
 	{
 	}
 
@@ -17,11 +17,11 @@ namespace CodeInjection
 	/// Allocates a block of code.
 	/// </summary>
 	/// <param name="size">The size of the block to allocate.</param>
-	/// <returns>The allocated block if successful, or <c>nullptr</c> on failure.</returns>
+	/// <returns>The allocated block if successful, or <c>NULL</c> on failure.</returns>
 	void* CodeAllocator::allocate(size_t size)
 	{
 		if (!ensureAvailable(size))
-			return nullptr;
+			return NULL;
 
 		// Simple push-back-the-pointer allocation
 		uint8_t *result = ptr;
@@ -83,7 +83,7 @@ namespace CodeInjection
 			releaseBuffer(buffers.top());
 			buffers.pop();
 		}
-		ptr = nullptr;
+		ptr = NULL;
 		sizeRemaining = 0;
 	}
 }

@@ -54,7 +54,7 @@ int main(int argc, const char *argv[])
 	}
 
 	// Launch the game
-	execl(GamePath, GamePath, "-nohomedir", nullptr);
+	execl(GamePath, GamePath, "-nohomedir", NULL);
 	showError("Failed to launch the game");
 	return 1;
 }

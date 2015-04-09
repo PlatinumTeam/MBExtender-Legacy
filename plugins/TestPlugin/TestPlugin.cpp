@@ -15,16 +15,16 @@ ConsoleFunction(pq, void, 1, 1, "pq()")
 ConsoleFunction(testCam, void, 2, 2, "testCam(marble)")
 {
 	TGE::Marble *marble = static_cast<TGE::Marble*>(TGE::Sim::findObject(argv[1]));
-	if (marble != nullptr)
+	if (marble != NULL)
 	{
 		MatrixF mat;
-		marble->getCameraTransform(nullptr, &mat);
+		marble->getCameraTransform(NULL, &mat);
 		for (int i = 0; i < 4; i++)
 			TGE::Con::printf("%f %f %f %f", mat(i, 0), mat(i, 1), mat(i, 2), mat(i, 3));
 	}
 	else
 	{
-		TGE::Con::errorf("marble == nullptr!");
+		TGE::Con::errorf("marble == NULL!");
 	}
 }
 

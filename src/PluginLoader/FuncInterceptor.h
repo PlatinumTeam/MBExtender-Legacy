@@ -25,7 +25,7 @@ namespace CodeInjection
 		/// </summary>
 		/// <param name="func">The function to intercept.</param>
 		/// <param name="newFunc">The new function to redirect callers to.</param>
-		/// <returns>A pointer which can be used to call the original function, or <c>nullptr</c> on failure.</returns>
+		/// <returns>A pointer which can be used to call the original function, or <c>NULL</c> on failure.</returns>
 		template<class T>
 		T intercept(T func, T newFunc)
 		{
@@ -49,7 +49,7 @@ namespace CodeInjection
 		/// </summary>
 		/// <param name="func">The function to intercept.</param>
 		/// <param name="newFunc">The new function to redirect callers to.</param>
-		/// <returns>A pointer which can be used to call the original function, or <c>nullptr</c> on failure.</returns>
+		/// <returns>A pointer which can be used to call the original function, or <c>NULL</c> on failure.</returns>
 		void* interceptImpl(void *func, void *newFunc);
 
 		/// <summary>
