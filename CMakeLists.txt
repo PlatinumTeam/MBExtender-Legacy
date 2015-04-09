@@ -19,7 +19,6 @@ elseif (MSVC)
 	cmake_policy (SET CMP0054 NEW) # CMake complains otherwise when we call enable_language
 	enable_language (ASM_MASM)
 	set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO") # SAFESEH needs to be disabled because LDE64 doesn't support it
-	set (CMAKE_GENERATOR_TOOLSET "v120_xp" CACHE STRING "Toolset to compile with") # Force XP (this is kinda hackish, but the CMake GUI doesn't let you specify a toolset yet)
 
 	# Force use of static runtime library
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
