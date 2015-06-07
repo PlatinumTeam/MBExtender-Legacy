@@ -5,22 +5,23 @@ namespace
 {
 	bool verifyGame();
 }
+
 void installHooks();
-
-DWORD WINAPI initPluginLoader(LPVOID unused)
-{
-	if (!verifyGame())
-	{
-		MessageBox(NULL, "MBExtender is only compatible with the full version of Marble Blast Gold.", "MBExtender", MB_OK | MB_ICONERROR);
-		return false;
-	}
-
-	installHooks();
-	return true;
-}
 
 namespace
 {
+	extern "C" __declspec(dllexport) bool initPluginLoader()
+	{
+		if (!verifyGame())
+		{
+			MessageBox(NULL, "MBExtender is only compatible with the full version of Marble Blast Gold.", "MBExtender", MB_OK | MB_ICONERROR);
+			return false;
+		}
+
+		installHooks();
+		return true;
+	}
+
 	bool verifyGame()
 	{
 		const char *testPointer = reinterpret_cast<const char*>(0x6796C4);
@@ -46,6 +47,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	{
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hModule);
+		if (!initPluginLoader())
+			TerminateProcess(GetCurrentProcess(), 0);
 		break;
 	case DLL_PROCESS_DETACH:
 		break;

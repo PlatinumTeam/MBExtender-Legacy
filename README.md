@@ -53,11 +53,11 @@ Running
 -------
 
 #### Windows ####
-There are two methods of activating the plugin loader on Windows.
-
-The preferred method is to use a proxy vorbis.dll (FakeVorbis), because it does not require administrator access in order to run the game. Open the folder with your marbleblast.exe file in it. Find vorbis.dll and rename it to "vorbis-real.dll". Then, copy FakeVorbis.dll (built as part of MBExtender), PluginLoader.dll, and TorqueLib.dll to that folder, and place any plugin DLLs inside of a "plugins" folder. Run the game by simply launching marbleblast.exe.
-
-An external launcher similar to the one used on Mac and Linux is also available, but it requires administrator access. Copy MBExtender.exe, PluginLoader.dll, and TorqueLib.dll to the same folder as your marbleblast.exe file. Create a "plugins" folder and copy any plugin DLL files there. Run the game using MBExtender.exe.
+Copy the contents of your "bin" folder (see Compiling above) to the same folder as your Marble Blast Gold executable. Next, you will need to patch the game EXE so that it loads the extender. To do this, open a command prompt in that folder and run the following command (assuming that your EXE is named marbleblast.exe and you want an output EXE named marbleblast_ex.exe):
+```
+MBGPatcher marbleblast.exe marbleblast_ex.exe
+```
+This will copy your executable to a marbleblast_ex.exe file and then modify it so that it loads the extender on launch. Double-click on it to run the game.
 
 #### Mac OS X ####
 PluginLoader.dylib, TorqueLib.dylib, and the plugins folder must be copied to the Contents/MacOS folder inside the game's application package. Edit the game's Info.plist to change the executable that is launched, re-copy the game to your Applications folder if necessary, and launch it normally.

@@ -44,22 +44,18 @@ add_definitions(-DHAVE_CONFIG_H)
 # Register public include folder and build folder
 include_directories (include ${PROJECT_BINARY_DIR})
 
-# Launcher
+# Launcher (Mac/Linux only)
 if (UNIX)
-	add_executable (MBExtender src/MBExtender/unix/main-unix.cpp)
-elseif (WIN32)
-	add_executable (MBExtender WIN32
-		src/MBExtender/win32/main-win32.cpp
-		src/MBExtender/win32/DLLInjection.cpp
-	)
+	add_executable (MBExtender src/MBExtender/main-unix.cpp)
 endif ()
 
-# FakeVorbis (Windows only)
+# MBGPatcher (Windows only)
 if (WIN32)
-	add_library (FakeVorbis SHARED src/FakeVorbis/init.cpp src/FakeVorbis/vorbis.cpp)
-	if (MSVC)
-		set_property (TARGET FakeVorbis APPEND PROPERTY LINK_FLAGS "/DEF:\"${PROJECT_SOURCE_DIR}/src/FakeVorbis/vorbis.def\"")
-	endif ()
+	add_executable (MBGPatcher
+		src/MBGPatcher/main-win32.cpp
+		src/MBGPatcher/PEFile.cpp
+		src/MBGPatcher/PEFile.h
+	)
 endif ()
 
 # Plugin loader
@@ -235,9 +231,7 @@ endif ()
 
 # Remove the "lib" prefix from libraries
 set_target_properties (PluginLoader TorqueLib TestPlugin ExternalConsole RandomPowerupsDemo MovingPlatformsFix FrameRateUnlock PROPERTIES PREFIX "")
-if (WIN32)
-	set_target_properties (FakeVorbis PROPERTIES PREFIX "")
-elseif (UNIX)
+if (UNIX)
 	set_target_properties (MultiplayerFix PROPERTIES PREFIX "")
 	if (NOT APPLE)
 		set_target_properties (FakeIgnition PROPERTIES PREFIX "")
@@ -248,13 +242,13 @@ endif ()
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	set (CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/install" CACHE PATH "default install path" FORCE)
 endif()
-install (TARGETS MBExtender DESTINATION bin)
 install (TARGETS PluginLoader RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 install (TARGETS TorqueLib RUNTIME DESTINATION bin LIBRARY DESTINATION bin ARCHIVE DESTINATION lib)
 install (TARGETS TestPlugin ExternalConsole RandomPowerupsDemo MovingPlatformsFix FrameRateUnlock DESTINATION bin/plugins)
 if (WIN32)
-	install (TARGETS FakeVorbis RUNTIME DESTINATION bin)
+	install (TARGETS MBGPatcher DESTINATION bin)
 elseif (UNIX)
+	install (TARGETS MBExtender DESTINATION bin)
 	install (TARGETS MultiplayerFix DESTINATION bin/plugins)
 	if (NOT APPLE)
 		install (TARGETS FakeIgnition DESTINATION bin/plugins)
