@@ -31,7 +31,7 @@ public:
 	{
 	}
 
-	std::string getPath() const { return path; }
+	const char* getPath() const { return path.c_str(); }
 	TorqueFunctionInterceptor *getInterceptor() const { return interceptor; }
 	void onClientProcess(clientProcess_ptr callback);
 

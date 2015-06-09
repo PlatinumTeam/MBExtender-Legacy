@@ -67,7 +67,7 @@ public:
 	/// Gets the path to the dynamic library for the current plugin.
 	/// </summary>
 	/// <returns>The path to the dynamic library for the current plugin. May not be absolute.</returns>
-	virtual std::string getPath() const = 0;
+	virtual const char* getPath() const = 0;
 
 	/// <summary>
 	/// Gets an object which can be used to intercept Torque functions.
