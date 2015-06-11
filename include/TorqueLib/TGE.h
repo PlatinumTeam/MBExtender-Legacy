@@ -93,67 +93,44 @@ namespace TGE
 		UNDEFVIRT(registerLights);
 	};
 
-	class SimObjectList: public VectorPtr<SimObject *>
+	class SimObjectList: public VectorPtr<SimObject*>
 	{
-		static S32 QSORT_CALLBACK compareId(const void *a,const void *b);
 	public:
-		void pushBack(SimObject *);
-		void pushBackForce(SimObject *);
-		void pushFront(SimObject *);
-		void remove(SimObject *);
-
-		SimObject *at(S32 index) const {
+		SimObject *at(S32 index) const
+		{
 			if (index >= 0 && index < size())
 				return (*this)[index];
 			return NULL;
 		}
-		void removeStable(SimObject *pObject);
-		void sortId();
 	};
+
 	class SimSet: public SimObject
 	{
-		SimObjectList objectList;
-		void *mMutex;
 	public:
 		UNDEFVIRT(onRemove);
 		UNDEFVIRT(onDeleteNotify);
-
 		UNDEFVIRT(addObject);
 		UNDEFVIRT(removeObject);
 		UNDEFVIRT(pushObject);
 		UNDEFVIRT(popObject);
-
 		UNDEFVIRT(write);
 		UNDEFVIRT(findObject);
 	};
+
 	class SimNameDictionary
 	{
-		SimObject **hashTable;
-		S32 hashTableSize;
-		S32 hashEntryCount;
-
-		void *mutex;
-	public:
-		void insert(SimObject* obj);
-		void remove(SimObject* obj);
-		SimObject* find(const char * name);
-
-		SimNameDictionary();
-		~SimNameDictionary();
 	};
+
 	class SimGroup: public SimSet
 	{
-		SimNameDictionary nameDictionary;
-	public:
-
 	};
 
 	class GuiControl: public SimGroup
 	{
 	public:
-		GETTERFNSIMP(RectI, getBounds, 0x58);
-		GETTERFNSIMP(Point2I, getPosition, 0x58);
-		GETTERFNSIMP(Point2I, getExtent, 0x60);
+		GETTERFNSIMP(RectI, getBounds, TGEOFF_GUICONTROL_BOUNDS);
+		GETTERFNSIMP(Point2I, getPosition, TGEOFF_GUICONTROL_POSITION);
+		GETTERFNSIMP(Point2I, getExtent, TGEOFF_GUICONTROL_EXTENT);
 	};
 
 	class GuiCanvas: public GuiControl
@@ -780,7 +757,7 @@ namespace TGE
 	GLOBALVAR(_StringTable*, StringTable, TGEADDR_STRINGTABLE);
 	GLOBALVAR(ResManager*, ResourceManager, TGEADDR_RESOURCEMANAGER);
 	GLOBALVAR(GameInterface*, Game, TGEADDR_GAME);
-	GLOBALVAR(GuiCanvas *, Canvas, TGEADDR_CANVAS);
+	GLOBALVAR(GuiCanvas*, Canvas, TGEADDR_CANVAS);
 }
 
 // ConsoleFunction() can't be used from inside PluginLoader.dll without crashes
