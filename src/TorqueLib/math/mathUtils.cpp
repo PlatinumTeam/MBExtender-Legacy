@@ -1113,7 +1113,7 @@ void sortQuadWindingOrder( const MatrixF &quadMat, bool clockwise, const Point3F
    
    Point3F *quadPoints = new Point3F[count];
    
-   for ( S32 i = 0; i < count; i++ )   
+   for ( U32 i = 0; i < count; i++ )   
 	{		
       quadMat.mulP( verts[i], &quadPoints[i] );
 		quadPoints[i].normalizeSafe();
@@ -1128,7 +1128,7 @@ void sortQuadWindingOrder( bool clockwise, const Point3F *verts, U32 *vertMap, U
 {
    QuadSortPoint *sortPoints = new QuadSortPoint[count];
 
-   for ( S32 i = 0; i < count; i++ )
+   for ( U32 i = 0; i < count; i++ )
    {
       QuadSortPoint &sortPnt = sortPoints[i];
       const Point3F &vec = verts[i];
@@ -1145,7 +1145,7 @@ void sortQuadWindingOrder( bool clockwise, const Point3F *verts, U32 *vertMap, U
 
    TGE::dQsort( sortPoints, count, sizeof( QuadSortPoint ), clockwise ? cmpAngleDescending : cmpAngleAscending ); 
 
-   for ( S32 i = 0; i < count; i++ )
+   for ( U32 i = 0; i < count; i++ )
       vertMap[i] = sortPoints[i].id;
 
    delete [] sortPoints;
@@ -1306,7 +1306,7 @@ void makeFrustum( F32 *outLeft,
                   F32 aspectRatio, 
                   F32 nearPlane )
 {
-   F32 top = nearPlane * mTan( fovYInRadians / 2.0 );
+   F32 top = static_cast<F32>( nearPlane * mTan( fovYInRadians / 2.0 ) );
    if ( outTop ) *outTop = top;
    if ( outBottom ) *outBottom = -top;
 
@@ -1349,14 +1349,14 @@ void makeProjection( MatrixF *outMatrix,
 {
 
    Point4F row;
-   row.x = 2.0*nearPlane / (right-left);
+   row.x = static_cast<F32>(2.0*nearPlane / (right-left));
    row.y = 0.0;
    row.z = 0.0;
    row.w = 0.0;
    outMatrix->setRow( 0, row );
 
    row.x = 0.0;
-   row.y = 2.0 * nearPlane / (top-bottom);
+   row.y = static_cast<F32>(2.0 * nearPlane / (top-bottom));
    row.z = 0.0;
    row.w = 0.0;
    outMatrix->setRow( 1, row );
