@@ -795,6 +795,25 @@ namespace TGE
 	static TGE::_ConsoleConstructor g##name##obj(#name, c##name, usage, minArgs, maxArgs); \
 	static returnType c##name(TGE::SimObject *, S32 argc, const char **argv)
 
+// O hackery of hackeries
+#define conmethod_return_const              return (const
+#define conmethod_return_S32                return (S32
+#define conmethod_return_F32                return (F32
+#define conmethod_nullify(val)
+#define conmethod_return_void               conmethod_nullify(void
+#define conmethod_return_bool               return (bool
+
+#define ConsoleMethod(className, name, type, minArgs, maxArgs, usage) \
+	static type c##className##name(TGE::className *, S32, const char **argv); \
+	static type c##className##name##caster(TGE::SimObject *object, S32 argc, const char **argv) { \
+		if (!object) \
+			TGE::Con::warnf("Object passed to " #name " is not a " #className "!"); \
+		conmethod_return_##type ) c##className##name(static_cast<TGE::className*>(object),argc,argv); \
+	}; \
+	static TGE::_ConsoleConstructor g##className##name##obj(#className, #name, c##className##name##caster, usage, minArgs, maxArgs); \
+	static type c##className##name(TGE::className *object, S32 argc, const char **argv)
+
+
 #endif // IN_PLUGIN_LOADER
 
 #endif // TORQUELIB_TGE_H
