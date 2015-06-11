@@ -217,7 +217,7 @@ public:
 
    // Math operator overloads
    //------------------------------------
-   friend MatrixF operator * ( const MatrixF &m1, const MatrixF &m2 );
+   friend DLLSPEC MatrixF operator * ( const MatrixF &m1, const MatrixF &m2 );
    MatrixF& operator *= ( const MatrixF &m );
 
    // Static identity matrix
@@ -564,7 +564,7 @@ inline VectorF MatrixF::getUpVector() const
 //------------------------------------
 // Math operator overloads
 //------------------------------------
-inline MatrixF operator * ( const MatrixF &m1, const MatrixF &m2 )
+DLLSPEC inline MatrixF operator * ( const MatrixF &m1, const MatrixF &m2 )
 {
    // temp = m1 * m2
    MatrixF temp;
