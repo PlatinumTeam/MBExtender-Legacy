@@ -765,19 +765,6 @@ namespace TGE
 
 namespace TGE
 {
-	/*OVERLOAD_PTR {
-			OVERLOAD_FN(void, (const char *name, StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs),                     TGEADDR_CON_ADDCOMMAND_5_STRING);
-			OVERLOAD_FN(void, (const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs),                       TGEADDR_CON_ADDCOMMAND_5_VOID);
-			OVERLOAD_FN(void, (const char *name, IntCallback cb, const char *usage, S32 minArgs, S32 maxArgs),                        TGEADDR_CON_ADDCOMMAND_5_INT);
-			OVERLOAD_FN(void, (const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs),                      TGEADDR_CON_ADDCOMMAND_5_FLOAT);
-			OVERLOAD_FN(void, (const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs),                       TGEADDR_CON_ADDCOMMAND_5_BOOL);
-			OVERLOAD_FN(void, (const char *nsName, const char *name, StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs), TGEADDR_CON_ADDCOMMAND_6_STRING);
-			OVERLOAD_FN(void, (const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs),   TGEADDR_CON_ADDCOMMAND_6_VOID);
-			OVERLOAD_FN(void, (const char *nsName, const char *name, IntCallback cb, const char *usage, S32 minArgs, S32 maxArgs),    TGEADDR_CON_ADDCOMMAND_6_INT);
-			OVERLOAD_FN(void, (const char *nsName, const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs),  TGEADDR_CON_ADDCOMMAND_6_FLOAT);
-			OVERLOAD_FN(void, (const char *nsName, const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs),   TGEADDR_CON_ADDCOMMAND_6_BOOL);
-		} addCommand;*/
-
 	// Psuedo class used to implement the ConsoleFunction macro.
 	class _ConsoleConstructor
 	{
@@ -839,6 +826,25 @@ namespace TGE
 	static returnType c##name(TGE::SimObject *, S32, const char **argv);                   \
 	static TGE::_ConsoleConstructor g##name##obj(#name, c##name, usage, minArgs, maxArgs); \
 	static returnType c##name(TGE::SimObject *, S32 argc, const char **argv)
+
+// Hacks to handle properly returning different value types from console methods
+#define CONMETHOD_NULLIFY(val)
+#define CONMETHOD_RETURN_const return (const
+#define CONMETHOD_RETURN_S32   return (S32
+#define CONMETHOD_RETURN_F32   return (F32
+#define CONMETHOD_RETURN_void  CONMETHOD_NULLIFY(void
+#define CONMETHOD_RETURN_bool  return (bool
+
+// Defines a console method.
+#define ConsoleMethod(className, name, type, minArgs, maxArgs, usage)                                                                \
+	static type c##className##name(TGE::className *, S32, const char **argv);                                                        \
+	static type c##className##name##caster(TGE::SimObject *object, S32 argc, const char **argv) {                                    \
+		if (!object)                                                                                                                 \
+			TGE::Con::warnf("Object passed to " #name " is null!");                                                                  \
+		CONMETHOD_RETURN_##type ) c##className##name(static_cast<TGE::className*>(object), argc, argv);                              \
+	};                                                                                                                               \
+	static TGE::_ConsoleConstructor g##className##name##obj(#className, #name, c##className##name##caster, usage, minArgs, maxArgs); \
+	static type c##className##name(TGE::className *object, S32 argc, const char **argv)
 
 #endif // IN_PLUGIN_LOADER
 
