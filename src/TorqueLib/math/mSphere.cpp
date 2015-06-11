@@ -55,9 +55,9 @@ bool SphereF::intersectsRay( const Point3F &start, const Point3F &end ) const
    F32 distSqrt = mSqrt( disc );
    F32 q;
    if ( b < 0 )
-      q = (-b - distSqrt)/2.0;
+      q = static_cast<F32>((-b - distSqrt)/2.0);
    else
-      q = (-b + distSqrt)/2.0;
+      q = static_cast<F32>((-b + distSqrt)/2.0);
 
    // compute t0 and t1
    F32 t0 = q / a;

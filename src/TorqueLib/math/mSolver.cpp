@@ -133,8 +133,8 @@ U32 mSolveCubic_c(F32 a, F32 b, F32 c, F32 d, F32 * x)
       F32 t = 2.f * mSqrt(-p);
 
       x[0] = t * mCos(phi);
-      x[1] = -t * mCos(phi + (M_PI / 3.f));
-      x[2] = -t * mCos(phi - (M_PI / 3.f));
+      x[1] = static_cast<F32>(-t * mCos(phi + (M_PI / 3.f)));
+      x[2] = static_cast<F32>(-t * mCos(phi - (M_PI / 3.f)));
       num = 3;
    }
    else                    // 1 solution
@@ -153,8 +153,8 @@ U32 mSolveCubic_c(F32 a, F32 b, F32 c, F32 d, F32 * x)
       x[i] -= sub;
 
    // sort the roots
-   for(S32 j = 0; j < (num - 1); j++)
-      for(S32 k = j + 1; k < num; k++)
+   for(U32 j = 0; j < (num - 1); j++)
+      for(U32 k = j + 1; k < num; k++)
          if(x[k] < x[j])
             swap(x[k], x[j]);
 
@@ -240,8 +240,8 @@ U32 mSolveQuartic_c(F32 a, F32 b, F32 c, F32 d, F32 e, F32 * x)
       x[i] -= sub;
 
    // sort the roots
-   for(S32 j = 0; j < (num - 1); j++)
-      for(S32 k = j + 1; k < num; k++)
+   for(U32 j = 0; j < (num - 1); j++)
+      for(U32 k = j + 1; k < num; k++)
          if(x[k] < x[j])
             swap(x[k], x[j]);
 
