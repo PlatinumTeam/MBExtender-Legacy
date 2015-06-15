@@ -19,7 +19,7 @@
  #define PATH_PREFIX "./Contents/MacOS/"
  const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.dylib";
  #define MB_TEXT_START 0x2BC0
- #define MB_TEXT_SIZE  0x265FA6
+ #define MB_TEXT_SIZE  0x290E49
 #elif defined(__linux)
  #define PATH_PREFIX "./"
  const char *const TorqueLibPath = PATH_PREFIX "TorqueLib.so";

@@ -31,14 +31,15 @@ namespace CodeInjection
 		/// </summary>
 		/// <param name="data">The data to write.</param>
 		/// <param name="dataSize">The size of the data to write. It must fit.</param>
-		void write(const void *data, size_t dataSize);
+		/// <returns><c>true</c> if the data was written successfully.</returns>
+		bool write(const void *data, size_t dataSize);
 
 		/// <summary>
 		/// Reads data from the stream at the current position, advancing the stream by the size of the data.
 		/// </summary>
 		/// <param name="out">The buffer to write data to.</param>
 		/// <param name="size">The number of bytes to read.</param>
-		/// <returns><c>true</c> if the read was successful.</param>
+		/// <returns><c>true</c> if the data was read successfully.</param>
 		bool read(void *out, size_t size);
 
 		/// <summary>
@@ -57,37 +58,43 @@ namespace CodeInjection
 		/// Writes a relative 32-bit jump instruction to the stream at the current position, advancing the stream by the size of the instruction.
 		/// </summary>
 		/// <param name="target">The target of the far jump instruction to write.</param>
-		void writeRel32Jump(void *target);
+		/// <returns><c>true</c> if the jump was written successfully.</returns>
+		bool writeRel32Jump(void *target);
 
 		/// <summary>
 		/// Writes a relative 32-bit call instruction to the stream at the current position, advancing the stream by the size of the instruction.
 		/// </summary>
 		/// <param name="target">The target of the far call instruction to write.</param>
-		void writeRel32Call(void *target);
+		/// <returns><c>true</c> if the call was written successfully.</returns>
+		bool writeRel32Call(void *target);
 
 		/// <summary>
 		/// Writes NOP instructions to the stream at the current position, advancing the stream by the size of the data written.
 		/// </summary>
 		/// <param name="count">The number of NOP instructions to write. Each instruction is one byte large.</param>
-		void writeNops(int count);
+		/// <returns><c>true</c> if the instructions were written successfully.</returns>
+		bool writeNops(int count);
 
 		/// <summary>
 		/// Seeks to an offset from the beginning of the stream's data block.
 		/// </summary>
 		/// <param name="offset">The offset to seek to. It must be inside the data block.</param>
-		void seekTo(size_t offset);
+		/// <returns><c>true</c> if the seek was successful.</returns>
+		bool seekTo(size_t offset);
 
 		/// <summary>
 		/// Seeks to a pointer inside the stream's data block.
 		/// </summary>
 		/// <param name="ptr">The pointer to seek to. It must be inside the data block.</param>
-		void seekTo(const void *ptr);
+		/// <returns><c>true</c> if the seek was successful.</returns>
+		bool seekTo(const void *ptr);
 
 		/// <summary>
 		/// Skips a number of bytes.
 		/// </summary>
 		/// <param name="count">The maximum number of bytes to skip.</param>
-		void skip(size_t count);
+		/// <returns>The actual number of bytes that were skipped.</returns>
+		size_t skip(size_t count);
 
 		/// <summary>
 		/// Commits any changes made to the code block.
@@ -142,7 +149,8 @@ namespace CodeInjection
 		/// </summary>
 		/// <param name="opcode">The opcode.</param>
 		/// <param name="target">The target.</param>
-		void writeRel32Jump(uint8_t opcode, void *target);
+		/// <returns><c>true</c> if the jump was written successfully.</returns>
+		bool writeRel32Jump(uint8_t opcode, void *target);
 
 		/// <summary>
 		/// Unprotects the stream's data block and allows the code inside it to be manipulated.

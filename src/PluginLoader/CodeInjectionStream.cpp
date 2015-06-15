@@ -28,14 +28,15 @@ namespace CodeInjection
 	/// </summary>
 	/// <param name="data">The data to write.</param>
 	/// <param name="dataSize">The size of the data to write. It must fit.</param>
-	void CodeInjectionStream::write(const void *data, size_t dataSize)
+	/// <returns><c>true</c> if the data was written successfully.</returns>
+	bool CodeInjectionStream::write(const void *data, size_t dataSize)
 	{
-		if (isSpaceAvailable(dataSize))
-		{
-			memcpy(currentPtr, data, dataSize);
-			currentPtr += dataSize;
-			needsFlush = true;
-		}
+		if (!isSpaceAvailable(dataSize))
+			return false;
+		memcpy(currentPtr, data, dataSize);
+		currentPtr += dataSize;
+		needsFlush = true;
+		return true;
 	}
 
 	/// <summary>
@@ -43,7 +44,7 @@ namespace CodeInjection
 	/// </summary>
 	/// <param name="out">The buffer to write data to.</param>
 	/// <param name="size">The number of bytes to read.</param>
-	/// <returns><c>true</c> if the read was successful.</param>
+	/// <returns><c>true</c> if the data was read successfully.</param>
 	bool CodeInjectionStream::read(void *out, size_t size)
 	{
 		if (!isSpaceAvailable(size))
@@ -88,18 +89,19 @@ namespace CodeInjection
 	/// Writes a relative 32-bit jump instruction to the stream at the current position, advancing the stream by the size of the instruction.
 	/// </summary>
 	/// <param name="target">The target of the far jump instruction to write.</param>
-	void CodeInjectionStream::writeRel32Jump(void *target)
+	/// <returns><c>true</c> if the jump was written successfully.</returns>
+	bool CodeInjectionStream::writeRel32Jump(void *target)
 	{
-		writeRel32Jump(Rel32JumpOpcode, target);
+		return writeRel32Jump(Rel32JumpOpcode, target);
 	}
 
 	/// <summary>
 	/// Writes a relative 32-bit call instruction to the stream at the current position, advancing the stream by the size of the instruction.
 	/// </summary>
-	/// <param name="target">The target of the far call instruction to write.</param>
-	void CodeInjectionStream::writeRel32Call(void *target)
+	/// <returns><c>true</c> if the call was written successfully.</returns>
+	bool CodeInjectionStream::writeRel32Call(void *target)
 	{
-		writeRel32Jump(Rel32CallOpcode, target);
+		return writeRel32Jump(Rel32CallOpcode, target);
 	}
 
 	/// <summary>
@@ -107,10 +109,11 @@ namespace CodeInjection
 	/// </summary>
 	/// <param name="opcode">The opcode.</param>
 	/// <param name="target">The target.</param>
-	void CodeInjectionStream::writeRel32Jump(uint8_t opcode, void *target)
+	/// <returns><c>true</c> if the jump was written successfully.</returns>
+	bool CodeInjectionStream::writeRel32Jump(uint8_t opcode, void *target)
 	{
 		if (!isSpaceAvailable(Rel32JumpSize))
-			return;
+			return false;
 
 		// offset = target - address of next instruction
 		int32_t offset = static_cast<uint8_t*>(target) - (currentPtr + Rel32JumpSize);
@@ -122,52 +125,62 @@ namespace CodeInjection
 
 		// Advance the stream
 		currentPtr += Rel32JumpSize;
+		return true;
 	}
 
 	/// <summary>
 	/// Writes NOP instructions to the stream at the current position, advancing the stream by the size of the data written.
 	/// </summary>
 	/// <param name="count">The number of NOP instructions to write. Each instruction is one byte large.</param>
-	void CodeInjectionStream::writeNops(int count)
+	/// <returns><c>true</c> if the data was written successfully.</returns>
+	bool CodeInjectionStream::writeNops(int count)
 	{
 		if (!isSpaceAvailable(count))
-			return;
+			return false;
 
 		for (int i = 0; i < count; i++)
 			currentPtr[i] = NopOpcode;
 
 		currentPtr += count;
+		return true;
 	}
 
 	/// <summary>
 	/// Seeks to an offset from the beginning of the stream's data block.
 	/// </summary>
 	/// <param name="offset">The offset to seek to. It must be inside the data block.</param>
-	void CodeInjectionStream::seekTo(size_t offset)
+	/// <returns><c>true</c> if the seek was successful.</returns>
+	bool CodeInjectionStream::seekTo(size_t offset)
 	{
-		if (offset <= size)
-			currentPtr = start + offset;
+		if (offset > size)
+			return false;
+		currentPtr = start + offset;
+		return true;
 	}
 
 	/// <summary>
 	/// Seeks to a pointer inside the stream's data block.
 	/// </summary>
 	/// <param name="ptr">The pointer to seek to. It must be inside the data block.</param>
-	void CodeInjectionStream::seekTo(const void *ptr)
+	/// <returns><c>true</c> if the seek was successful.</returns>
+	bool CodeInjectionStream::seekTo(const void *ptr)
 	{
-		seekTo(static_cast<const uint8_t*>(ptr) - start);
+		return seekTo(static_cast<const uint8_t*>(ptr) - start);
 	}
 
 	/// <summary>
 	/// Skips a number of bytes.
 	/// </summary>
 	/// <param name="count">The maximum number of bytes to skip.</param>
-	void CodeInjectionStream::skip(size_t count)
+	/// <returns>The actual number of bytes that were skipped.</returns>
+	size_t CodeInjectionStream::skip(size_t count)
 	{
+		uint8_t *oldPtr = currentPtr;
 		if (isSpaceAvailable(count))
 			currentPtr += count;
 		else
 			currentPtr = start + size;
+		return currentPtr - oldPtr;
 	}
 
 	/// <summary>

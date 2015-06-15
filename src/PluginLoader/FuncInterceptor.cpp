@@ -28,10 +28,11 @@ namespace CodeInjection
 	{
 		if (stream == NULL || func == NULL || newFunc == NULL)
 			return NULL;
+		if (!stream->seekTo(func))
+			return NULL;
 
 		// As an optimization, if the function is a thunk (it only does a relative jump),
 		// then a trampoline isn't necessary
-		stream->seekTo(func);
 		void *originalFunc = stream->peekRel32Jump();
 		if (originalFunc == NULL)
 		{
@@ -49,8 +50,10 @@ namespace CodeInjection
 		}
 		
 		// Write a jump to the new function and store the original function pointer
-		stream->seekTo(func);
-		stream->writeRel32Jump(newFunc);
+		if (!stream->seekTo(func))
+			return NULL;
+		if (!stream->writeRel32Jump(newFunc))
+			return NULL;
 		originalFunctions[func] = originalFunc;
 		return originalFunc;
 	}
@@ -64,7 +67,8 @@ namespace CodeInjection
 	{
 		if (stream == NULL)
 			return;
-		stream->seekTo(func);
+		if (!stream->seekTo(func))
+			return;
 		stream->writeRel32Jump(oldFunc);
 	}
 
