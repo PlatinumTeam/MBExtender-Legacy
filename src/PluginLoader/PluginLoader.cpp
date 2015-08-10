@@ -238,6 +238,12 @@ namespace
 	{
 		originalParticleInit();
 
+		// Only initialize on the first call to ParticleEngine::init
+		static bool initialized = false;
+		if (initialized)
+			return;
+		initialized = true;
+
 		registerFunctions();
 		pluginPostInit();
 		setPluginVariables();
