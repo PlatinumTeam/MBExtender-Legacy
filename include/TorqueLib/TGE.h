@@ -626,6 +626,7 @@ namespace TGE
 	{
 		// Initialization
 		FN(void, init, (), TGEADDR_PARTICLEENGINE_INIT);
+		FN(void, destroy, (), TGEADDR_PARTICLEENGINE_DESTROY);
 	}
 
 	namespace Sim
