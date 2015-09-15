@@ -19,7 +19,6 @@
 #include <TorqueLib/QuickOverride.h>
 #include <PluginLoader/PluginInterface.h>
 #include <memory>
-#include <algorithm>
 #include "GameTimer.hpp"
 
 #if defined(_WIN32)
@@ -34,11 +33,9 @@
 namespace
 {
 	std::unique_ptr<GameTimer> timer;            // Active frame rate timer
-	const uint32_t MinUpdateInterval = 1;        // Minimum value that updateInterval can have.
-	uint32_t updateInterval = MinUpdateInterval; // Update interval in milliseconds
+	const uint32_t UpdateInterval = 1;           // Minimum amount of milliseconds between updates
 	uint64_t lastTime;                           // Last frame time
-	double timeScale = 1.0;                      // Time multiplier
-	double accumulator = 0;                      // Time accumulator (used for time scaling - if this becomes >= 1, then an update can happen)
+	uint64_t accumulator = 0;                    // Time accumulator
 	bool enabled = true;                         // If set to false, fall back to old timing system
 		
 	/// <summary>
@@ -86,23 +83,20 @@ TorqueOverride(void, TimeManager::process, (), originalProcess)
 		return;
 	}
 
-	// Only update if at least updateInterval milliseconds have passed
-	uint64_t elapsedMs = (timer->getTime() - lastTime) * 1000 / timer->getTicksPerSecond();
-	if (elapsedMs >= updateInterval)
-	{
-		// Add a whole number of milliseconds onto the reference time
-		lastTime += elapsedMs * timer->getTicksPerSecond() / 1000;
+	// Measure the amount of time since the last cycle and add it to the accumulator
+	uint64_t newTime = timer->getTime();
+	accumulator += newTime - lastTime;
+	lastTime = newTime;
 
-		// Add time to the accumulator
-		accumulator += timeScale * elapsedMs;
-		if (accumulator >= 1.0)
-		{
-			// At least 1ms accumulated - post a time update event
-			TGE::TimeEvent ev;
-			ev.deltaTime = static_cast<U32>(accumulator);
-			TGE::Game->postEvent(ev);
-			accumulator -= ev.deltaTime;
-		}
+	// Check if enough ms have accumulated
+	U32 accumulatorMs = static_cast<U32>(accumulator * 1000 / timer->getTicksPerSecond());
+	if (accumulatorMs >= UpdateInterval)
+	{
+		// Post a time update event
+		TGE::TimeEvent ev;
+		ev.deltaTime = accumulatorMs;
+		TGE::Game->postEvent(ev);
+		accumulator -= accumulatorMs * timer->getTicksPerSecond() / 1000;
 	}
 }
 
@@ -119,24 +113,6 @@ ConsoleFunction(enableFrameRateUnlock, void, 2, 2, "enableFrameRateUnlock(enable
 	else
 	{
 		TGE::Con::printf("Frame rate unlock disabled");
-	}
-}
-
-// Console function to set the update interval
-ConsoleFunction(setTickInterval, void, 2, 2, "setTickInterval(msec)")
-{
-	uint32_t newInterval = atoi(argv[1]);
-	updateInterval = std::max(MinUpdateInterval, newInterval);
-}
-
-// Console function to set the time scale
-ConsoleFunction(setTimeScale, void, 2, 2, "setTimeScale(scale)")
-{
-	double newScale = atof(argv[1]);
-	if (newScale > 0)
-	{
-		timeScale = newScale;
-		TGE::Con::printf("Set time scale to %f", timeScale);
 	}
 }
 
