@@ -2,21 +2,36 @@
 #include <cstring>
 #include "PEFile.h"
 
-// Name of the DLL to load and the functions to add
-char *const DllName = "PluginLoader.dll";
-char *DllFunctions[] = { "initPluginLoader" };
+const char *DefaultSuffix = "-patched";        // EXE suffix to append when only one argument is passed
+char *const DllName = "PluginLoader.dll";      // DLL to load
+char *DllFunctions[] = { "initPluginLoader" }; // Functions to add
 
 int main(int argc, char *argv[])
 {
-	if (argc != 3)
+	if (argc != 2 && argc != 3)
 	{
 		std::cout << "MBGPatcher: Modifies the Marble Blast Gold EXE to load " << DllName << std::endl;
-		std::cout << "Usage: MBGPatcher <path to Marble Blast Gold EXE> <path to output EXE>" << std::endl;
+		std::cout << "Usage: MBGPatcher <path to Marble Blast Gold EXE> [path to output EXE]" << std::endl;
 		return 1;
 	}
 
 	char *inputPath = argv[1];
-	char *outputPath = argv[2];
+	std::string outputPath;
+	if (argc == 3)
+	{
+		// Take the output path from the command line
+		outputPath = argv[2];
+	}
+	else
+	{
+		// Append the suffix onto the end of the EXE name
+		outputPath = inputPath;
+		size_t extensionStart = outputPath.find('.');
+		if (extensionStart != std::string::npos)
+			outputPath.insert(extensionStart, DefaultSuffix);
+		else
+			outputPath += DefaultSuffix;
+	}
 
 	// Load the input file
 	PEFile inputFile;
@@ -41,7 +56,7 @@ int main(int argc, char *argv[])
 
 	// Add the import and save the file
 	inputFile.addImport(DllName, DllFunctions, sizeof(DllFunctions) / sizeof(DllFunctions[0]));
-	if (!inputFile.saveToFile(outputPath))
+	if (!inputFile.saveToFile(&outputPath[0]))
 	{
 		std::cerr << "Error: failed to save the output file!" << std::endl;
 		return 4;
