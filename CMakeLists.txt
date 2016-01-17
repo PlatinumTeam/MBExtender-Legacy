@@ -8,12 +8,16 @@ if (UNIX)
 	enable_language (ASM)
 
 	# Force 32 bit
-	# NOTE: This causes issues with Xcode. You still have to explicitly set a 32-bit target.
 	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 	set (CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -m32")
 	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
 	set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -m32")
+	
+	if (APPLE)
+		# Use a 32-bit compiler
+		SET(CMAKE_XCODE_ATTRIBUTE_ARCHS "\$(ARCHS_STANDARD_32_BIT)")
+	endif()
 elseif (MSVC)
 	# Set VC++ settings
 	cmake_policy (SET CMP0054 NEW) # CMake complains otherwise when we call enable_language
