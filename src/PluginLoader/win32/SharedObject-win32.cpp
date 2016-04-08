@@ -33,7 +33,7 @@ bool SharedObject::loaded() const
 
 bool SharedObject::unload()
 {
-	if (handle && CloseHandle(static_cast<HMODULE>(handle)) != 0)
+	if (handle && FreeLibrary(static_cast<HMODULE>(handle)))
 	{
 		handle = NULL;
 		return true;
